@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from douban.items import DoubanItem
+from scrapy.http import Request
 
 class DangdangSpider(scrapy.Spider):
     name = 'dangdang'
     allowed_domains = ['dangdang.com']
-    start_urls = ['http://dangdang.com/']
+    start_urls = ['http://category.dangdang.com/pg1-cp01.54.00.00.00.00.html']
 
-    def start_requests(self):
-        user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.22 \
-                      Safari/537.36 SE 2.X MetaSr 1.0'
-        headers = {'User-Agent': user_agent}
-        yield scrapy.Request(url=self.start_urls, headers=headers, method='GET', callback=self.parse)
+
 
     def parse(self, response):
         item = DoubanItem()
@@ -19,7 +16,11 @@ class DangdangSpider(scrapy.Spider):
         item['link'] = response.xpath("//a[@name='itemlist-title']/@href").extract()
         item['content'] = response.xpath("//p[@class='search_hot_word']/text()").extract()
         item['comment'] = response.xpath("//a[@name='itemlist-review']/text()").extract()
-        item['price'] = response.xpath("//span[@class='price_n']/text()").extract()
+        item['price'] = response.xpath("//span[@class='price_n']/text()").extract()[5:]
+        item['press'] = response.xpath("//a[@name='itemlist-author']/text()").extract()
         yield item
+        for i in range(2, 101):
+            url = 'http://category.dangdang.com/pg'+str(i)+'-cp01.54.00.00.00.00.html'
+            yield Request(url, callback=self.parse)
 
 

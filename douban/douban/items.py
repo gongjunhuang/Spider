@@ -16,3 +16,4 @@ class DoubanItem(scrapy.Item):
     content = scrapy.Field()
     comment = scrapy.Field()
     price = scrapy.Field()
+    press = scrapy.Field()

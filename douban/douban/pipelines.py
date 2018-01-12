@@ -8,10 +8,13 @@
 
 class DoubanPipeline(object):
     def process_item(self, item, spider):
-        for i in range(0, len(item['title'])):
-            title = item['title'][i]
-            link = item['link'][i]
-            content = item['content'][i]
-            comment = item['comment'][i]
-            price = item['price'][i]
+        for i in range(len(item['title'])):
+            print(item['title'][i])
+            print(item['link'][i])
+            print(item['content'][i])
+            print(item['comment'][i])
+            print(item['price'][i])
+            print(item['press'][i])
+            print('===============')
+
         return item

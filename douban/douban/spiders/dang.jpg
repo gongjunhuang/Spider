@@ -2,8 +2,7 @@ import scrapy
 import requests
 from scrapy import Selector
 from lxml import etree
-from ..items import DangdangItem
-from scrapy_redis.spiders import RedisSpider
+
 
 class DangdangSpider(RedisSpider):
     name = 'dangdangspider'
@@ -65,7 +64,7 @@ class DangdangSpider(RedisSpider):
                 contents = etree.HTML(contents.content.decode('gbk'))
                 goodslist = contents.xpath('//*[@class="list_aa listimg"]/li')
                 for goods in goodslist:
-                    item = DangdangItem()
+                    item = DoubanItem()
                     try:
                         item['comments'] = goods.xpath('div/p[2]/a/text()').pop()
                         item['title'] = goods.xpath('div/p[1]/a/text()').pop()
