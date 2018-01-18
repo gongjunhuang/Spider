@@ -4,7 +4,7 @@ import datetime
 import os
 import random
 from urllib.request import urlretrieve
-import pymysql
+
 import shutil
 
 headers = {
