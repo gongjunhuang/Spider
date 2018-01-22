@@ -91,7 +91,7 @@ def download_torrent(url, filename, referer):
         f.write(res.content)
 
 if __name__ == '__main__':
-    for i in range(114099, 120000):
+    for i in range(143430, 143439):
         url = 'http://javtorrent.re/censored/' + str(i)
         try:
             get_size(url)

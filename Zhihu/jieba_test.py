@@ -11,11 +11,8 @@ from collections import Counter
 from scipy.misc import imread
 
 
-data = pd.read_csv('C:\\Users\\JOE\\Desktop\\wwxd.csv',encoding='utf-8')
-#print(data['Star'].value_counts)
-
-def plot_distri(data):
-
+data = pd.read_csv('C:\\Users\\JOE\\Desktop\\wwxd.csv', encoding='utf-8')
+def plot_distribution(data):
     index = np.arange(5)
     star_counts = data['Star'].value_counts()
     values = (star_counts[0], star_counts[1], star_counts[2], star_counts[3], star_counts[4])
@@ -33,7 +30,6 @@ def plot_distri(data):
 
 def segment_words(stars):
     comments = None
-
     if stars == 'all':
         comments = data['Comments']
     else:
@@ -46,32 +42,34 @@ def segment_words(stars):
             comments_list.append(comment)
 
     text = ''.join(comments_list)
-    word_list = list(jieba.cut(text))
-    c = Counter(word_list)
-    common_c = c.most_common(100)
+    # word_list = list(jieba.cut(text))
+    jieba.suggest_freq("无问西东", True)
+    word_list = jieba.analyse.extract_tags(text, topK=50, withWeight=False, allowPOS=())
     print(word_list)
-    words = ''.join(word_list)
+    c = Counter(word_list)
+    print(c)
+    common_c = c.most_common(50)
+    print(common_c)
+    #words = ''.join(word_list)
 
     return common_c
 
 def plot_word_cloud(words):
     coloring = np.array(Image.open('C:\\Users\\JOE\\Desktop\\zzy.jpeg'))
-    pic = imread('C:\\Users\\JOE\\Desktop\\zzy.jpeg')
-    wc = WordCloud(background_color='white', max_words=100, mask=pic, max_font_size=60, random_state=42
+    pic = imread('C:\\Users\\JOE\\Desktop\\jzm.jpg')
+    wc = WordCloud(background_color='white', max_words=50, mask=pic, max_font_size=60, random_state=42
                    , font_path='C:\\Users\\JOE\\Downloads\\DroidSansFallbackFull.ttf', scale=2)
-    image_color = ImageColorGenerator(coloring)
+    #image_color = ImageColorGenerator(pic)
     wc.generate_from_frequencies(dict(words))
 
     plt.figure()
     #plt.imshow(wc.recolor(color_func=image_color))
-
-
-
     plt.imshow(wc)
     plt.axis('off')
     plt.show()
     wc.to_file('1.jpg')
 
-all_words = segment_words('all')
-print(all_words)
-plot_word_cloud(all_words)
+if __name__ == '__main__':
+    all_words = segment_words('all')
+    print(all_words)
+    plot_word_cloud(all_words)
