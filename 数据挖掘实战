@@ -22,14 +22,151 @@
 
 1.KNN算法
 
-采用测量不同特征值之间的距离方法进行分类。工作原理：存在一个样本数据集合，称作训练样本集，并且样本集中每个数据都存在标签，即我们知道样本集中每一个数据与所属分类的对应关系。
-输入没有标签的新数据之后，将新数据的每个特征与样本集中数据对应的特征进行比较，然后算法提取样本集中特征最相似数据的分类标签。
+采用测量不同特征值之间的距离方法进行分类。工作原理：存在一个样本数据集合，称作训练样本集，
+并且样本集中每个数据都存在标签，即我们知道样本集中每一个数据与所属分类的对应关系。
+输入没有标签的新数据之后，将新数据的每个特征与样本集中数据对应的特征进行比较，
+然后算法提取样本集中特征最相似数据的分类标签。
+
+1.处理数据
+
+2.数据向量化
+
+3.计算欧几里德距离
+
+4.根据距离进行分类
 
 优点：精度高、对异常值不敏感、无数据输入假定；缺点：计算复杂度高、空间复杂度高
 
+伪代码：
+
+```
+1.计算已知类别数据集中的点与当前点之间的距离
+2.按照距离递增次序排列
+3.选取与当前距离最小的K个点
+4.确定前k个点所在类别的出现频率
+5.返回前k个点出现频率最高的类别作为当前点的预测分类
+
+```
+
+```
+from numpy import *
+import operator
+
+def createDataSet():
+    group = array([1.0, 1.1], [1.0, 1.0], [0, 0], [0, 0.1])
+    labels = ['A', 'A', 'B', 'B']
+    return group, labels
+
+def classify0(inX, dataSet, labels, k):
+    # shape得出的是行列数，shape[0]是行数
+    dataSetSize = dataSet.shape[0]
+    # tile将inX在扩展为dataSetSize行
+    diffMat = tile(inX, (dataSetSize, 1)) - dataSet
+    # 计算矩阵每一项的平方
+    sqDiffMat = diffMat ** 2
+    # 计算每一行的平方求和，axis=1代表行方向
+    sqDistances = sqDidffMat.sum(axis=1)
+    # 欧氏距离
+    distances = sqDistances ** 0.5
+    # 将距离进行排序
+    sortedDistIndices = distances.argsort()
+    classCount = {}
+    for i in range(k):
+        voteIlabel = labels[sortedDistIndices[i]]
+        # 字典get(key, default)，如果没有key，则返回default
+        classCount[voteIlabel] = classCount.get(voteIlabel, 0) + 1
+        # 通过key=operator.itemgetter(1)进行排序，以字典的第二个参数进行排序
+    sortedClassCount = sorted(classCount.iteritems(), key=operator.itemgetter(1), reverse=True)
+    return sortedClassCount[0][0]
+
+```
+
+图片处理
+```
+from PIL import Image
+image = Image.open('file')
+file = open('a.txt', 'a')
+width = image.size[0]
+height = image.size[1]
+
+for i in range(0, width):
+    for j in range(0, height):
+        # 返回点(i, j)的r，g，b数值
+        cl = image.getpixel(i, j)
+        # rgb均为0则为黑色
+        clall = cl[0] + cl[1] + cl[2]
+        if (clall == 0):
+        #黑色
+            file.write('1')
+        else:
+            file.write('0')
+      file.write('\n')
+file.close()
+```
+
+手写数字识别
+```
+from numpy import *
+import os
+import operator
+
+def img2vector(filename):
+    returnVect = zeros((1, 1024))
+    fr = open(filename)
+    for i in range(32):
+        lineStr = fr.readline()
+        for j in range(32):
+            returnVect[0, 32*i+j] = int(lineStr[j])
+    return returnVect
+
+def classify(inX, dataSet, labels, k):
+    dataSetSize = dataSet.shape[0]
+    diffMat = tile(inX, (dataSetSize, 1)) - dataSet # 将分类向量拓展到训练集同一个维度，求差
+    sqDiffMat = diffMat ** 2
+    sqDistance = sqDiffMat.sum(axis=1)
+    distances = sqDistance ** 0.5
+    sortedDistIndices = distances.argsort()
+    classCount = {}
+    for i in range(k):
+        voteIlabel = labels[sortedDistIndices[i]]
+        classCount[voteIlabel] = classCount.get(voteIlabel, 0) + 1
+    sortedClassCount = sorted(classCount.items(), key=operator.itemgetter(1), reverse=True)
+    return sortedClassCount[0][0]
+
+def handwritingClassTest():
+    hwLabels = []
+    trainingFileList = os.listdir('E:\\BaiduNetdiskDownload\\源码\\第7周\\traindata')
+    m = len(trainingFileList)
+    trainingMat = zeros((m, 1024))
+    for i in range(m):
+        filenameStr = trainingFileList[i]
+        fileStr = filenameStr.split('.')[0]
+        classNumStr = int(fileStr.split('_')[0])
+        hwLabels.append(classNumStr)
+        trainingMat[i, :] = img2vector("E:\\BaiduNetdiskDownload\\源码\\第7周\\traindata\\%s" % filenameStr)
+    testFileList = os.listdir('E:\\BaiduNetdiskDownload\\源码\\第7周\\testdata')
+    errorCount = 0.0
+    mTest = len(testFileList)
+    for i in range(mTest):
+        filenameStr = testFileList[i]
+        fileStr = filenameStr.split('.')[0]
+        classNumStr = int(fileStr.split('_')[0])
+        vecUnderTest = img2vector("E:\\BaiduNetdiskDownload\\源码\\第7周\\testdata\\%s" % filenameStr)
+        classifierResult = classify(vecUnderTest, trainingMat, hwLabels, 3)
+        print('the classifier came back with: %d, the real answer is: %d' %(classifierResult, classNumStr))
+        if classifierResult != classNumStr:
+            errorCount += 1
+    print('\nthe total number of errors is: %d\n' % errorCount)
+    print('the total error rate is: %f'% (errorCount / float(mTest)))
+
+if __name__ == '__main__':
+    handwritingClassTest()
+```
+
 适用数据范围：数值型和标称型
 
-2.贝克斯算法
+
+
 
 3.决策树
 

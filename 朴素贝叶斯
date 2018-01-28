@@ -1,0 +1,96 @@
+贝叶斯算法
+
+选择具有最高概率的决策
+
+p(a|b) = p(b|a)p(a)/p(b)
+
+一般过程：
+
+（1）收集数据：可以使用任何方法
+（2）准备数据：需要数值型或者布尔型数据
+（3）分析数据：有大量特征时，绘制特征作用不大，此时用直方图效果更好
+（4）训练算法：计算不同的独立特征的条件概率
+（5）测试算法：计算错误率
+（6）使用算法：可以在任意分类场景中使用朴素贝叶斯分类器
+
+
+使用Python进行文本分类
+
+```
+def loadDataSet():
+    postingList = [['my', 'dog', 'has', 'flea', 'problems', 'help'],
+                   ['maybe', 'not', 'take', 'him', 'to', 'park', 'stupid'],
+                   ['my', 'dalmation', 'is', 'so', 'cute'],
+                   ['stop', 'posting', 'stupid', 'worthless', 'garbage'],
+                   ['mr', 'licks', 'ate', 'my', 'steak'],
+                   ['quit', 'buying', 'worthless', 'dog', 'food', 'stupid']]
+    classVec = [0, 1, 0, 1, 0, 1]
+    return postingList, classVec
+
+def createVocalList(dataSet):
+    # 创建一个空集
+    vocalSet = set([])
+    # 两个集合的并集
+    for document in dataSet:
+        vocalSet = vocalSet | set(document)
+    return list(vocalSet)
+
+def setOfWords2Vec(vocalList, inputSet):
+    # 创建一个全为0的向量
+    returnVec = [0]*len(vocalList)
+    for word in inputSet:
+        if word in vocalList:
+            returnVec[vocalList.index(word)] = 1
+        else:
+            print("the word: %s is not in my vocabulary" % word)
+    return returnVec
+
+def trainNB0(trainMat, trainCate):
+    numberTrainDocs = len(trainMat)
+    numberTrainWords = len(trainMat[0])
+    pAbusive = sum(trainCate) / float(numberTrainDocs)
+    p0Num = zeros(numberTrainWords)
+    p1Num = zeros(numberTrainWords)
+    p0Demon = 0.0
+    p1Demon = 0.0
+    for i in range(numberTrainDocs):
+        if trainCate[i] == 1:
+            p1Num += trainMat[i]
+            p1Demon += sum(trainMat[i])
+            print("-------------------")
+            print(p1Num)
+            print(p1Demon)
+        else:
+            p0Num += trainMat[i]
+            p0Demon += sum(trainMat[i])
+            print("=======================")
+            print(p0Num)
+            print(p0Demon)
+    p1Vect = p1Num / p1Demon
+    p0Vect = p0Num / p0Demon
+    return p0Vect, p1Vect, pAbusive
+
+if __name__ == '__main__':
+    listPosts, listClasses = loadDataSet()
+    myVocalList = createVocalList(listPosts)
+    listR = setOfWords2Vec(myVocalList, listPosts[0])
+
+    trainMat = []
+    for postInDoc in listPosts:
+        trainMat.append(setOfWords2Vec(myVocalList, postInDoc))
+    # print(listR)
+    print(trainMat)
+    p0V, p1V, pAb = trainNB0(trainMat, listClasses)
+    print(p0V)
+    print(p1V)
+    print(pAb)
+```
+
+使用朴素贝叶斯过滤垃圾邮件
+
+1.收集数据，提供文本文件
+2.准备数据，将文本文件解析成词条向量
+3.分析数据，检查词条确保解析的正确性
+4.训练算法，用建立的trainNB0函数
+5.测试算法，使用classifyNB，并且构建一个新的测试函数来计算文档集的错误率
+6.使用算法，构建一个完整的程序对一组文档进行分类，将错分的文档输出到屏幕上
