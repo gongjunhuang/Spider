@@ -1,29 +1,3 @@
-Logistic回归：最优化算法     Sigmoid函数
-
-假设现在有一些数据点，用一条直线堆这些点进行拟合，这个拟合过程称为回归。
-
-主要思想：根据现有数据对分类边界线建立回归公式
-
-训练分类器：寻找最佳拟合参数，使用最优化算法
-
-过程：
-
-（1）收集数据：采用任意方法收集数据
-（2）准备数据：数值型，结构化数据格式最佳
-（3）分析数据
-（4）训练算法
-（5）测试算法
-（6）使用算法
-
-Sigmoid        1/(1 + e^(-x))
-
-实现Logistic回归分类器，在每个特征上都乘以一个回归系数，然后所有的结果值相加，将总和代入
-Sigmoid函数中，进而得到一个范围在0-1之间的数值。任意大于0.5的数据将被分入1类，小于0.5的
-归入0类。
-
-算法实现
-
-```
 from numpy import *
 import matplotlib.pyplot as plt
 
@@ -104,4 +78,3 @@ def stocGradAscent1(dataMat, classLabels, numIter=150):
             weights = weights + alpha * error * dataMat[randIndex]
             del(dataIndex[randIndex])
     return weights
-```

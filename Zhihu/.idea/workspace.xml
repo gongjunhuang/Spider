@@ -16,10 +16,12 @@
     <SUITE FILE_PATH="coverage/Zhihu$torrent.coverage" NAME="torrent Coverage Results" MODIFIED="1516538771558" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Zhihu$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1516281791260" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Zhihu$test3.coverage" NAME="test3 Coverage Results" MODIFIED="1516377842026" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Zhihu$creditcard.coverage" NAME="creditcard Coverage Results" MODIFIED="1517152737926" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Zhihu$TFIDF.coverage" NAME="TFIDF Coverage Results" MODIFIED="1516719576432" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Zhihu$test.coverage" NAME="test Coverage Results" MODIFIED="1516202762031" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Zhihu$hub_download.coverage" NAME="hub_download Coverage Results" MODIFIED="1515934932329" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Zhihu$Zhihu.coverage" NAME="Zhihu Coverage Results" MODIFIED="1515914242507" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Zhihu$logisticR.coverage" NAME="logisticR Coverage Results" MODIFIED="1517146041206" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Zhihu$jieba.coverage" NAME="jieba Coverage Results" MODIFIED="1516428230587" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Zhihu$douban_login.coverage" NAME="douban_login Coverage Results" MODIFIED="1516517659877" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Zhihu$DeleteSpam.coverage" NAME="DeleteSpam Coverage Results" MODIFIED="1517058799934" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -39,11 +41,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="dir.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dir.py">
+      <file leaf-file-name="LogisticRegression.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/LogisticRegression.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="190">
-              <caret line="46" column="74" lean-forward="false" selection-start-line="46" selection-start-column="74" selection-end-line="46" selection-end-column="74" />
+            <state relative-caret-position="304">
+              <caret line="67" column="16" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="79" selection-end-column="18" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -51,58 +53,26 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DeleteSpam.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/DeleteSpam.py">
+      <file leaf-file-name="logisticR.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/logisticR.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="297">
-              <caret line="85" column="49" lean-forward="false" selection-start-line="85" selection-start-column="49" selection-end-line="85" selection-end-column="49" />
+            <state relative-caret-position="274">
+              <caret line="21" column="28" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="21" selection-end-column="37" />
               <folding>
-                <element signature="e#0#9#0" expanded="true" />
+                <element signature="e#0#19#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TFIDF.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/TFIDF.py">
+      <file leaf-file-name="creditcard.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/creditcard.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="277">
-              <caret line="48" column="28" lean-forward="false" selection-start-line="48" selection-start-column="28" selection-end-line="48" selection-end-column="28" />
+            <state relative-caret-position="193">
+              <caret line="30" column="29" lean-forward="false" selection-start-line="30" selection-start-column="29" selection-end-line="30" selection-end-column="29" />
               <folding>
-                <element signature="e#0#27#0" expanded="true" />
+                <element signature="e#0#19#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="jieba_test.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/jieba_test.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="190">
-              <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="29" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="blog.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/blog.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="353">
-              <caret line="54" column="27" lean-forward="false" selection-start-line="26" selection-start-column="1" selection-end-line="54" selection-end-column="27" />
-              <folding>
-                <element signature="e#23#38#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="bayes.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/bayes.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="133">
-              <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="56" selection-end-column="16" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -134,6 +104,9 @@
         <option value="$PROJECT_DIR$/dir.py" />
         <option value="$PROJECT_DIR$/bayes.py" />
         <option value="$PROJECT_DIR$/DeleteSpam.py" />
+        <option value="$PROJECT_DIR$/LogisticRegression.py" />
+        <option value="$PROJECT_DIR$/logisticR.py" />
+        <option value="$PROJECT_DIR$/creditcard.py" />
       </list>
     </option>
   </component>
@@ -144,8 +117,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="357" />
-    <option name="y" value="8" />
+    <option name="x" value="224" />
+    <option name="y" value="1" />
     <option name="width" value="1346" />
     <option name="height" value="745" />
   </component>
@@ -194,7 +167,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.DeleteSpam">
+  <component name="RunManager" selected="Python.creditcard">
     <configuration name="DeleteSpam" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -209,24 +182,6 @@
       <module name="Zhihu" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/DeleteSpam.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-    </configuration>
-    <configuration name="TFIDF" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="Zhihu" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/TFIDF.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -249,6 +204,24 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
+    <configuration name="creditcard" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="Zhihu" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/creditcard.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
     <configuration name="dir" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -267,7 +240,7 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
-    <configuration name="torrent" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="logisticR" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -280,25 +253,25 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="Zhihu" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/torrent.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/logisticR.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Python.torrent" />
-      <item index="1" class="java.lang.String" itemvalue="Python.TFIDF" />
-      <item index="2" class="java.lang.String" itemvalue="Python.dir" />
-      <item index="3" class="java.lang.String" itemvalue="Python.bayes" />
-      <item index="4" class="java.lang.String" itemvalue="Python.DeleteSpam" />
+      <item index="0" class="java.lang.String" itemvalue="Python.dir" />
+      <item index="1" class="java.lang.String" itemvalue="Python.bayes" />
+      <item index="2" class="java.lang.String" itemvalue="Python.DeleteSpam" />
+      <item index="3" class="java.lang.String" itemvalue="Python.logisticR" />
+      <item index="4" class="java.lang.String" itemvalue="Python.creditcard" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.DeleteSpam" />
-        <item index="1" class="java.lang.String" itemvalue="Python.bayes" />
-        <item index="2" class="java.lang.String" itemvalue="Python.dir" />
-        <item index="3" class="java.lang.String" itemvalue="Python.TFIDF" />
-        <item index="4" class="java.lang.String" itemvalue="Python.torrent" />
+        <item index="0" class="java.lang.String" itemvalue="Python.creditcard" />
+        <item index="1" class="java.lang.String" itemvalue="Python.logisticR" />
+        <item index="2" class="java.lang.String" itemvalue="Python.DeleteSpam" />
+        <item index="3" class="java.lang.String" itemvalue="Python.bayes" />
+        <item index="4" class="java.lang.String" itemvalue="Python.dir" />
       </list>
     </recent_temporary>
   </component>
@@ -316,7 +289,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="357" y="8" width="1346" height="745" extended-state="0" />
+    <frame x="224" y="1" width="1346" height="745" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14661655" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -325,7 +298,7 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25158226" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.36392406" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -405,7 +378,7 @@
         <state relative-caret-position="874">
           <caret line="54" column="27" lean-forward="true" selection-start-line="26" selection-start-column="1" selection-end-line="54" selection-end-column="27" />
           <folding>
-            <element signature="e#23#38#0" expanded="true" />
+            <element signature="e#23#38#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -582,7 +555,7 @@
         <state relative-caret-position="277">
           <caret line="48" column="28" lean-forward="false" selection-start-line="48" selection-start-column="28" selection-end-line="48" selection-end-column="28" />
           <folding>
-            <element signature="e#0#27#0" expanded="true" />
+            <element signature="e#0#27#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -600,7 +573,7 @@
         <state relative-caret-position="353">
           <caret line="54" column="27" lean-forward="false" selection-start-line="26" selection-start-column="1" selection-end-line="54" selection-end-column="27" />
           <folding>
-            <element signature="e#23#38#0" expanded="true" />
+            <element signature="e#23#38#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -628,7 +601,7 @@
         <state relative-caret-position="190">
           <caret line="46" column="74" lean-forward="false" selection-start-line="46" selection-start-column="74" selection-end-line="46" selection-end-column="74" />
           <folding>
-            <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#0#19#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -646,7 +619,45 @@
         <state relative-caret-position="297">
           <caret line="85" column="49" lean-forward="false" selection-start-line="85" selection-start-column="49" selection-end-line="85" selection-end-column="49" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#9#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/python36/Lib/site-packages/pandas/core/indexes/base.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="81">
+          <caret line="1699" column="0" lean-forward="false" selection-start-line="1699" selection-start-column="0" selection-end-line="1699" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LogisticRegression.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="304">
+          <caret line="67" column="16" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="79" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logisticR.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="274">
+          <caret line="21" column="28" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="21" selection-end-column="37" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/creditcard.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="193">
+          <caret line="30" column="29" lean-forward="false" selection-start-line="30" selection-start-column="29" selection-end-line="30" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
