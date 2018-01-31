@@ -1,0 +1,181 @@
+风格
+
+因子变量绘图
+
+箱线图boxplot
+小提琴图violinplot
+散点图striplot
+带分布的散点图swarmplot
+直方图barplot
+计数的直方图countplot
+两变量关系图factorplot
+回归图
+回归图只要探讨两连续数值变量的变化趋势情况，绘制x-y的散点图和回归曲线。
+
+线性回归图lmplot
+线性回归图regplot
+分布图
+包括单变量核密度曲线，直方图，双变量多变量的联合直方图，和密度图
+
+热力图
+1. 热力图heatmap
+
+聚类图
+1. 聚类图clustermap
+
+时间序列图
+1. 时间序列图tsplot
+2. 我的时序图plot_ts_d , plot_ts_m
+
+分面绘图
+1.分面绘图FacetGrid
+
+Seaborn内置5种主题：darkgrid, whitegrid, dark, white和ticks，默认为darkgrid
+```
+sns.set_style('whitegrid')
+data = np.random.normal(size=(20,6))+np.arange(6)/2
+sns.boxplot(data=data)
+```
+
+缩放
+
+缩放在seaborn库内相关的尺寸有：paper, notebook, talk和poster, notebook是默认值。
+```
+sns.set_context('paper')
+plt.figure(figsize=(8,6))
+sns.boxplot(data)
+```
+
+选择颜色方案
+
+选择颜色方案是一个很有技巧的事情，Seaborn库定制一些颜色方案可使用。
+一般使用到color_palette()和set_palette(),三种类型的调色板：qualitative, sequential和diverging
+
+Qualitative 用于离散化没有固定顺序的分块数据
+
+Sequential 用于有顺序的分块数据
+
+diverging 用于中间有分割点的分块数据
+```
+# 画八种颜色的
+sns.palplot(sns.color_palette("hls", 8))
+sns.boxplot(data=data, palette=sns.palplot(sns.color_palette("hls", 8)))
+# l-亮度       s-饱和度  saturation
+sns.palplot(sns.hls_palette(8, ;=7, s=9))
+
+#xkcd颜色来命名颜色
+plt.plot([0,1], [0, 1], sns.xkcd_rgb['pale_red'], lw=3#线宽)
+#颜色由浅到深或者相反
+light_pallte      dark_palette
+
+
+current_palette = sns.color_palette()
+sns.palplot(current_palette) #plot current color palette;
+sns.set_palette("husl")
+pal = sns.dark_palette('purple', as_cmap=True)
+sns.kdeplot(x, y, cmap=pal)
+```
+
+绘图函数
+
+数据分布可视化
+
+单变量分布
+sns.distplot默认画出一个直方图和kde(核密度估计）图
+```
+#bins=n 当前轴切分成n块
+#fit=stats.gamma     当前分布的形状
+import seaborn as sns
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+iris = sns.load_dataset('iris')
+sns.pairplot(iris)
+
+
+x = np.random.normal(size=100)
+sns.distplot(x, kde=True , rug=True， hist=True)
+#sns.rugplot
+#sns.kdeplot
+```
+
+回归关系可视化
+
+画出包含95%置信区间的线性回归结果，线性的和多项式的拟合结果都可以，regplot()的参数可以调节。
+residplot可以画出拟合后的残差结果。
+```
+#
+sns.regplot(x='total_bill', y='tip', data=tips)
+sns.regplot(x='total_bill', y='tip', data=tips)
+sns.residplot() ### plot residual value to check model
+sns.jointplot(kind='reg')
+```
+
+类别型变量可视化
+
+散点图
+```
+#jitter=True    消除重叠影响
+import seaborn as sns
+sns.set(style='whitegrid', color_codes=True)
+
+#np.random.seed(sum(map(ord, categorical)))
+titanic = sns.load_dataset('titanic')
+tips = sns.load_dataset('tips')
+iris = sns.load_dataset('iris')
+
+sns.stripplot(x='day', y='total_bill', data=tips)
+
+sns.stripplot(x='day', y='total_bill',data=tips, jitter=True);
+
+# 比较宽松的类型
+sns.swarmplot(x, y, hue) # can add another categorical variable with hue parameter
+```
+
+变量的分布图，盒子样式
+```
+sns.boxplot(x,y,hue,data)
+sns.violinplot(x,y,hue)  #boxplot with kde
+```
+
+统计估计
+```
+# 条形图
+sns.barplot(x,y,hue)
+sns.barplot(x='sex', y='survived', hue='class', data=titanic)
+
+sns.countplot(x, data)
+
+
+sns.pointplot(x, y,hue)
+```
+
+绘制多面板的相关图
+类似于更高层次的pairplot
+```
+sns.factorplot(x, y, hue, col, kind)
+```
+
+数据敏感的gridplot
+```
+g = sns.FacetGrid(tips, col='time',row='age', hue='smoker')
+g.map(plt.hist, 'total_bill', 'tip') #plt.hist can be a customized plot function
+```
+
+子集需要展示的时候，FacetGrid
+```
+g = sns.FacetGrid(tips, col='time')
+g.map(plt.hist, 'tip')
+
+g = sns.FacetGrid(tips, col='sex', hue='smoker')
+g.map(plt.scatter,'total_bill', 'tip', alpha=0.7)
+g.add_legend()
+```
+
+热力图heatmap
+
+```
+#linewidths=5    格的宽度
+uniform_data = np.random.rand(3, 4)
+heatmap = sns.heatmap(uniform_data)
+```
