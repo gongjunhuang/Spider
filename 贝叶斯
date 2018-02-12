@@ -1,0 +1,43 @@
+贝叶斯
+
+正向概率：假设袋子里面有N个白球，M个黑球，取黑球的概率多大
+
+逆向概率：事先不知道袋子里黑白球的比例，直接摸一个或者多个球，观察取出来之后球的颜色，
+可以就此堆袋子里面黑白球的比例作出什么样的推测
+
+编辑距离：
+两个词之间的编辑距离定义为使用了几次插入、删除、交换、替换的操作把一个词变成另一个词
+
+```
+import re, collections
+
+def words(text):
+    return re.findall('[a-z]+', text.lower())
+
+def train(feature):
+    model = collections.defaultdict(lambda: 1)
+    for f in feature:
+        model[f] += 1
+    return model
+
+NWORDS = train(words(open('big.txt').read()))
+alphabet = 'abcdefghijklmnopqrstuvwxyz'
+
+def edits1(words):
+    n = len(word)
+    return set([word[0:i] + word[i+1:] for i in range(n)] +                             #deletion
+              [word[0:i] + word[i+1:] + word[i] + word[i+2:] for i in range(n-1)] +     #transposition
+              [word[0:i] + c + word[i+1:] for i in range(n) for c in alphabet] +        #alteration
+              [word[0:i] + c + word[i:] for i in range(n) for c in alphabet])           #insertion
+
+def edits2(words):
+    return set(e2 for e1 in edits1(words) for e2 in edits1(e1))
+
+def known(words):
+    return set(w for w in words if w in NWORDS)
+
+def correct(word):
+    candidates = known([word]) or known(edits1(word)) or known(edits2(word)) or [word]
+    return max(candidates, key=lambda w: NWORDS[w])
+
+```
