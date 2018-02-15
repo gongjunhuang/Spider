@@ -149,9 +149,246 @@ train_data['Fare_bin_id'] = pd.factorize(train_data['Fare_bin'])[0]
 fare_bin_dummies_df = pd.get_dummies(train_data['Fare_bin']).rename(columns=lambda x: 'Fare_' + str(x))
 train_data = pd.concat([train_data, fare_bin_dummies_df], axis=1)
 
-
-
 '''
+
+在进行特征工程的时候，我们不仅需要对训练数据进行处理，还需要同时将测试数据同训练数据一起处理，使得二者具有相同的数据类型和数据分布。
+
+对数据进行特征工程，也就是从各项参数中提取出对输出结果有或大或小的影响的特征，将这些特征作为训练模型的依据。 一般来说，我们会先从含有缺失值的特征开始。
+
+(1) Embarked
+
+因为“Embarked”项的缺失值不多，所以这里我们以众数来填充：
+combined_train_test['Embarked'].fillna(combined_train_test['Embarked'].mode().iloc[0], inplace=True)
+
+对于三种不同的港口，由上面介绍的数值转换，我们知道可以有两种特征处理方式：dummy和facrorizing。因为只有三个港口，所以我们可以直接用dummy来处理：
+
+# 为了后面的特征分析，这里我们将 Embarked 特征进行facrorizing
+combined_train_test['Embarked'] = pd.factorize(combined_train_test['Embarked'])[0]
+
+# 使用 pd.get_dummies 获取one-hot 编码
+emb_dummies_df = pd.get_dummies(combined_train_test['Embarked'], prefix=combined_train_test[['Embarked']].columns[0])
+combined_train_test = pd.concat([combined_train_test, emb_dummies_df], axis=1)
+
+对Sex也进行one-hot编码，也就是dummy处理：
+
+# 为了后面的特征分析，这里我们也将 Sex 特征进行facrorizing
+combined_train_test['Sex'] = pd.factorize(combined_train_test['Sex'])[0]
+
+sex_dummies_df = pd.get_dummies(combined_train_test['Sex'], prefix=combined_train_test[['Sex']].columns[0])
+combined_train_test = pd.concat([combined_train_test, sex_dummies_df], axis=1)
+
+
+(3) Name
+
+首先先从名字中提取各种称呼：
+combined_train_test['Title'] = combined_train_test['Name'].map(lambda x: re.compile(", (.*?)\.").findall(x)[0])
+
+title_Dict = {}
+title_Dict.update(dict.fromkeys(['Capt', 'Col', 'Major', 'Dr', 'Rev'], 'Officer'))
+title_Dict.update(dict.fromkeys(['Don', 'Sir', 'the Countess', 'Dona', 'Lady'], 'Royalty'))
+title_Dict.update(dict.fromkeys(['Mme', 'Ms', 'Mrs'], 'Mrs'))
+title_Dict.update(dict.fromkeys(['Mlle', 'Miss'], 'Miss'))
+title_Dict.update(dict.fromkeys(['Mr'], 'Mr'))
+title_Dict.update(dict.fromkeys(['Master','Jonkheer'], 'Master'))
+
+combined_train_test['Title'] = combined_train_test['Title'].map(title_Dict)
+combined_train_test['Name_length'] = combined_train_test['Name'].apply(len)
+
+(4) Fare
+
+由前面分析可以知道，Fare项在测试数据中缺少一个值，所以需要对该值进行填充。
+我们按照一二三等舱各自的均价来填充：
+下面transform将函数np.mean应用到各个group中。
+
+combined_train_test['Fare'] = combined_train_test[['Fare']].fillna(combined_train_test.groupby('Pclass').transform(np.mean))
+
+通过对Ticket数据的分析，我们可以看到部分票号数据有重复，同时结合亲属人数及名字的数据，和票价船舱等级对比，
+我们可以知道购买的票中有家庭票和团体票，所以我们需要将团体票的票价分配到每个人的头上。
+combined_train_test['Group_Ticket'] = combined_train_test['Fare'].groupby(by=combined_train_test['Ticket']).transform('count')
+combined_train_test['Fare'] = combined_train_test['Fare'] / combined_train_test['Group_Ticket']
+combined_train_test.drop(['Group_Ticket'], axis=1, inplace=True)
+
+使用binning给票价分等级：
+combined_train_test['Fare_bin'] = pd.qcut(combined_train_test['Fare'], 5)
+
+对于5个等级的票价我们也可以继续使用dummy为票价等级分列：
+combined_train_test['Fare_bin_id'] = pd.factorize(combined_train_test['Fare_bin'])[0]
+
+fare_bin_dummies_df = pd.get_dummies(combined_train_test['Fare_bin_id']).rename(columns=lambda x: 'Fare_' + str(x))
+combined_train_test = pd.concat([combined_train_test, fare_bin_dummies_df], axis=1)
+combined_train_test.drop(['Fare_bin'], axis=1, inplace=True)
+
+(5) Pclass
+
+Pclass这一项，其实已经可以不用继续处理了，我们只需要将其转换为dummy形式即可。
+
+但是为了更好的分析问题，我们这里假设对于不同等级的船舱，各船舱内部的票价也说明了各等级舱的位置，那么也就很有可能与逃生的顺序有关系。所以这里分出每等舱里的高价和低价位。
+from sklearn.preprocessing import LabelEncoder
+
+# 建立PClass Fare Category
+def pclass_fare_category(df, pclass1_mean_fare, pclass2_mean_fare, pclass3_mean_fare):
+    if df['Pclass'] == 1:
+        if df['Fare'] <= pclass1_mean_fare:
+            return 'Pclass1_Low'
+        else:
+            return 'Pclass1_High'
+    elif df['Pclass'] == 2:
+        if df['Fare'] <= pclass2_mean_fare:
+            return 'Pclass2_Low'
+        else:
+            return 'Pclass2_High'
+    elif df['Pclass'] == 3:
+        if df['Fare'] <= pclass3_mean_fare:
+            return 'Pclass3_Low'
+        else:
+            return 'Pclass3_High'
+
+Pclass1_mean_fare = combined_train_test['Fare'].groupby(by=combined_train_test['Pclass']).mean().get([1]).values[0]
+Pclass2_mean_fare = combined_train_test['Fare'].groupby(by=combined_train_test['Pclass']).mean().get([2]).values[0]
+Pclass3_mean_fare = combined_train_test['Fare'].groupby(by=combined_train_test['Pclass']).mean().get([3]).values[0]
+# 建立Pclass_Fare Category
+combined_train_test['Pclass_Fare_Category'] = combined_train_test.apply(pclass_fare_category, args=(
+    Pclass1_mean_fare, Pclass2_mean_fare, Pclass3_mean_fare), axis=1)
+pclass_level = LabelEncoder()
+
+# 给每一项添加标签
+pclass_level.fit(np.array(
+    ['Pclass1_Low', 'Pclass1_High', 'Pclass2_Low', 'Pclass2_High', 'Pclass3_Low', 'Pclass3_High']))
+
+# 转换成数值
+combined_train_test['Pclass_Fare_Category'] = pclass_level.transform(combined_train_test['Pclass_Fare_Category'])
+
+# dummy 转换
+pclass_dummies_df = pd.get_dummies(combined_train_test['Pclass_Fare_Category']).rename(columns=lambda x: 'Pclass_' + str(x))
+combined_train_test = pd.concat([combined_train_test, pclass_dummies_df], axis=1)
+
+combined_train_test['Pclass'] = pd.factorize(combined_train_test['Pclass'])[0]
+
+
+(6) Parch and SibSp
+
+由前面的分析，我们可以知道，亲友的数量没有或者太多会影响到Survived。所以将二者合并为FamliySize这一组合项，同时也保留这两项。
+
+def family_size_category(family_size):
+    if family_size <= 1:
+        return 'Single'
+    elif family_size <= 4:
+        return 'Small_Family'
+    else:
+        return 'Large_Family'
+
+combined_train_test['Family_Size'] = combined_train_test['Parch'] + combined_train_test['SibSp'] + 1
+combined_train_test['Family_Size_Category'] = combined_train_test['Family_Size'].map(family_size_category)
+
+le_family = LabelEncoder()
+le_family.fit(np.array(['Single', 'Small_Family', 'Large_Family']))
+combined_train_test['Family_Size_Category'] = le_family.transform(combined_train_test['Family_Size_Category'])
+
+family_size_dummies_df = pd.get_dummies(combined_train_test['Family_Size_Category'],
+                                        prefix=combined_train_test[['Family_Size_Category']].columns[0])
+combined_train_test = pd.concat([combined_train_test, family_size_dummies_df], axis=1)
+
+(7) Age
+
+因为Age项的缺失值较多，所以不能直接填充age的众数或者平均数。
+
+常见的有两种对年龄的填充方式：一种是根据Title中的称呼，如Mr，Master、Miss等称呼不同类别的人的平均年龄来填充；一种是综合几项如Sex、Title、Pclass等其他没有缺失值的项，使用机器学习算法来预测Age。
+
+这里我们使用后者来处理。以Age为目标值，将Age完整的项作为训练集，将Age缺失的项作为测试集
+
+missing_age_df = pd.DataFrame(combined_train_test[
+    ['Age', 'Embarked', 'Sex', 'Title', 'Name_length', 'Family_Size', 'Family_Size_Category','Fare', 'Fare_bin_id', 'Pclass']])
+
+missing_age_train = missing_age_df[missing_age_df['Age'].notnull()]
+missing_age_test = missing_age_df[missing_age_df['Age'].isnull()]
+
+建立Age的预测模型，我们可以多模型预测，然后再做模型的融合，提高预测的精度。
+
+from sklearn import ensemble
+from sklearn import model_selection
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor
+
+def fill_missing_age(missing_age_train, missing_age_test):
+    missing_age_X_train = missing_age_train.drop(['Age'], axis=1)
+    missing_age_Y_train = missing_age_train['Age']
+    missing_age_X_test = missing_age_test.drop(['Age'], axis=1)
+
+    # model 1  gbm
+    gbm_reg = GradientBoostingRegressor(random_state=42)
+    gbm_reg_param_grid = {'n_estimators': [2000], 'max_depth': [4], 'learning_rate': [0.01], 'max_features': [3]}
+    gbm_reg_grid = model_selection.GridSearchCV(gbm_reg, gbm_reg_param_grid, cv=10, n_jobs=25, verbose=1, scoring='neg_mean_squared_error')
+    gbm_reg_grid.fit(missing_age_X_train, missing_age_Y_train)
+    print('Age feature Best GB Params:' + str(gbm_reg_grid.best_params_))
+    print('Age feature Best GB Score:' + str(gbm_reg_grid.best_score_))
+    print('GB Train Error for "Age" Feature Regressor:' + str(gbm_reg_grid.score(missing_age_X_train, missing_age_Y_train)))
+    missing_age_test.loc[:, 'Age_GB'] = gbm_reg_grid.predict(missing_age_X_test)
+    print(missing_age_test['Age_GB'][:4])
+
+    # model 2 rf
+    rf_reg = RandomForestRegressor()
+    rf_reg_param_grid = {'n_estimators': [200], 'max_depth': [5], 'random_state': [0]}
+    rf_reg_grid = model_selection.GridSearchCV(rf_reg, rf_reg_param_grid, cv=10, n_jobs=25, verbose=1, scoring='neg_mean_squared_error')
+    rf_reg_grid.fit(missing_age_X_train, missing_age_Y_train)
+    print('Age feature Best RF Params:' + str(rf_reg_grid.best_params_))
+    print('Age feature Best RF Score:' + str(rf_reg_grid.best_score_))
+    print('RF Train Error for "Age" Feature Regressor' + str(rf_reg_grid.score(missing_age_X_train, missing_age_Y_train)))
+    missing_age_test.loc[:, 'Age_RF'] = rf_reg_grid.predict(missing_age_X_test)
+    print(missing_age_test['Age_RF'][:4])
+
+    # two models merge
+    print('shape1', missing_age_test['Age'].shape, missing_age_test[['Age_GB', 'Age_RF']].mode(axis=1).shape)
+    # missing_age_test['Age'] = missing_age_test[['Age_GB', 'Age_LR']].mode(axis=1)
+
+    missing_age_test.loc[:, 'Age'] = np.mean([missing_age_test['Age_GB'], missing_age_test['Age_RF']])
+    print(missing_age_test['Age'][:4])
+
+    missing_age_test.drop(['Age_GB', 'Age_RF'], axis=1, inplace=True)
+
+    return missing_age_test
+
+combined_train_test.loc[(combined_train_test.Age.isnull()), 'Age'] = fill_missing_age(missing_age_train, missing_age_test)
+
+(8) Ticket
+
+观察Ticket的值，我们可以看到，Ticket有字母和数字之分，而对于不同的字母，可能在很大程度上就意味着船舱等级或者不同船舱的
+位置，也会对Survived产生一定的影响，所以我们将Ticket中的字母分开，为数字的部分则分为一类。
+
+combined_train_test['Ticket_Letter'] = combined_train_test['Ticket'].str.split().str[0]
+combined_train_test['Ticket_Letter'] = combined_train_test['Ticket_Letter'].apply(lambda x: 'U0' if x.isnumeric() else x)
+
+# 如果要提取数字信息，则也可以这样做，现在我们对数字票单纯地分为一类。
+# combined_train_test['Ticket_Number'] = combined_train_test['Ticket'].apply(lambda x: pd.to_numeric(x, errors='coerce'))
+# combined_train_test['Ticket_Number'].fillna(0, inplace=True)
+
+# 将 Ticket_Letter factorize
+combined_train_test['Ticket_Letter'] = pd.factorize(combined_train_test['Ticket_Letter'])[0]
+
+(9) Cabin
+
+因为Cabin项的缺失值确实太多了，我们很难对其进行分析，或者预测。所以这里我们可以直接将Cabin这一项特征去除。但通过上面的分析，可以知道，该特征信息的有无也与生存率有一定的关系，所以这里我们暂时保留该特征，并将其分为有和无两类。
+
+combined_train_test.loc[combined_train_test.Cabin.isnull(), 'Cabin'] = 'U0'
+combined_train_test['Cabin'] = combined_train_test['Cabin'].apply(lambda x: 0 if x == 'U0' else 1)
+
+
+
+特征间相关性分析
+
+我们挑选一些主要的特征，生成特征之间的关联图，查看特征与特征之间的相关性：
+Correlation = pd.DataFrame(combined_train_test[
+    ['Embarked', 'Sex', 'Title', 'Name_length', 'Family_Size', 'Family_Size_Category','Fare', 'Fare_bin_id', 'Pclass',
+     'Pclass_Fare_Category', 'Age', 'Ticket_Letter', 'Cabin']])
+
+colormap = plt.cm.viridis
+plt.figure(figsize=(14,12))
+plt.title('Pearson Correlation of Features', y=1.05, size=15)
+sns.heatmap(Correlation.astype(float).corr(),linewidths=0.1,vmax=1.0, square=True, cmap=colormap, linecolor='white', annot=True)
+
+特征之间的数据分布图
+g = sns.pairplot(combined_train_test[[u'Survived', u'Pclass', u'Sex', u'Age', u'Fare', u'Embarked',
+       u'Family_Size', u'Title', u'Ticket_Letter']], hue='Survived', palette = 'seismic',size=1.2,diag_kind = 'kde',diag_kws=dict(shade=True),plot_kws=dict(s=10) )
+g.set(xticklabels=[])
 
 
 ```
