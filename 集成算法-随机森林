@@ -391,4 +391,227 @@ g = sns.pairplot(combined_train_test[[u'Survived', u'Pclass', u'Sex', u'Age', u'
 g.set(xticklabels=[])
 
 
+输入模型前的一些处理：
+
+1. 一些数据的正则化
+
+这里我们将Age和fare进行正则化：
+scale_age_fare = preprocessing.StandardScaler().fit(combined_train_test[['Age','Fare', 'Name_length']])
+combined_train_test[['Age','Fare', 'Name_length']] = scale_age_fare.transform(combined_train_test[['Age','Fare', 'Name_length']])
+
+2. 弃掉无用特征
+
+对于上面的特征工程中，我们从一些原始的特征中提取出了很多要融合到模型中的特征，但是我们需要剔除那些原本的我们用不到的或者非数值特征：
+
+首先对我们的数据先进行一下备份，以便后期的再次分析：
+
+combined_data_backup = combined_train_test
+
+combined_train_test.drop(['PassengerId', 'Embarked', 'Sex', 'Name', 'Title', 'Fare_bin_id', 'Pclass_Fare_Category',
+                          'Parch', 'SibSp', 'Family_Size_Category', 'Ticket'],axis=1,inplace=True)
+
+3. 将训练数据和测试数据分开：
+
+train_data = combined_train_test[:891]
+test_data = combined_train_test[891:]
+
+titanic_train_data_X = train_data.drop(['Survived'],axis=1)
+titanic_train_data_Y = train_data['Survived']
+titanic_test_data_X = test_data.drop(['Survived'],axis=1)
+
+6. 模型融合及测试
+
+模型融合的过程需要分几步来进行。
+
+(1) 利用不同的模型来对特征进行筛选，选出较为重要的特征：
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.tree import DecisionTreeClassifier
+
+def get_top_n_features(titanic_train_data_X, titanic_train_data_Y, top_n_features):
+
+    # random forest
+    rf_est = RandomForestClassifier(random_state=0)
+    rf_param_grid = {'n_estimators': [500], 'min_samples_split': [2, 3], 'max_depth': [20]}
+    rf_grid = model_selection.GridSearchCV(rf_est, rf_param_grid, n_jobs=25, cv=10, verbose=1)
+    rf_grid.fit(titanic_train_data_X, titanic_train_data_Y)
+    print('Top N Features Best RF Params:' + str(rf_grid.best_params_))
+    print('Top N Features Best RF Score:' + str(rf_grid.best_score_))
+    print('Top N Features RF Train Score:' + str(rf_grid.score(titanic_train_data_X, titanic_train_data_Y)))
+    feature_imp_sorted_rf = pd.DataFrame({'feature': list(titanic_train_data_X),
+                                          'importance': rf_grid.best_estimator_.feature_importances_}).sort_values('importance', ascending=False)
+    features_top_n_rf = feature_imp_sorted_rf.head(top_n_features)['feature']
+    print('Sample 10 Features from RF Classifier')
+    print(str(features_top_n_rf[:10]))
+
+    # AdaBoost
+    ada_est =AdaBoostClassifier(random_state=0)
+    ada_param_grid = {'n_estimators': [500], 'learning_rate': [0.01, 0.1]}
+    ada_grid = model_selection.GridSearchCV(ada_est, ada_param_grid, n_jobs=25, cv=10, verbose=1)
+    ada_grid.fit(titanic_train_data_X, titanic_train_data_Y)
+    print('Top N Features Best Ada Params:' + str(ada_grid.best_params_))
+    print('Top N Features Best Ada Score:' + str(ada_grid.best_score_))
+    print('Top N Features Ada Train Score:' + str(ada_grid.score(titanic_train_data_X, titanic_train_data_Y)))
+    feature_imp_sorted_ada = pd.DataFrame({'feature': list(titanic_train_data_X),
+                                           'importance': ada_grid.best_estimator_.feature_importances_}).sort_values('importance', ascending=False)
+    features_top_n_ada = feature_imp_sorted_ada.head(top_n_features)['feature']
+    print('Sample 10 Feature from Ada Classifier:')
+    print(str(features_top_n_ada[:10]))
+
+    # ExtraTree
+    et_est = ExtraTreesClassifier(random_state=0)
+    et_param_grid = {'n_estimators': [500], 'min_samples_split': [3, 4], 'max_depth': [20]}
+    et_grid = model_selection.GridSearchCV(et_est, et_param_grid, n_jobs=25, cv=10, verbose=1)
+    et_grid.fit(titanic_train_data_X, titanic_train_data_Y)
+    print('Top N Features Best ET Params:' + str(et_grid.best_params_))
+    print('Top N Features Best ET Score:' + str(et_grid.best_score_))
+    print('Top N Features ET Train Score:' + str(et_grid.score(titanic_train_data_X, titanic_train_data_Y)))
+    feature_imp_sorted_et = pd.DataFrame({'feature': list(titanic_train_data_X),
+                                          'importance': et_grid.best_estimator_.feature_importances_}).sort_values('importance', ascending=False)
+    features_top_n_et = feature_imp_sorted_et.head(top_n_features)['feature']
+    print('Sample 10 Features from ET Classifier:')
+    print(str(features_top_n_et[:10]))
+
+    # GradientBoosting
+    gb_est =GradientBoostingClassifier(random_state=0)
+    gb_param_grid = {'n_estimators': [500], 'learning_rate': [0.01, 0.1], 'max_depth': [20]}
+    gb_grid = model_selection.GridSearchCV(gb_est, gb_param_grid, n_jobs=25, cv=10, verbose=1)
+    gb_grid.fit(titanic_train_data_X, titanic_train_data_Y)
+    print('Top N Features Best GB Params:' + str(gb_grid.best_params_))
+    print('Top N Features Best GB Score:' + str(gb_grid.best_score_))
+    print('Top N Features GB Train Score:' + str(gb_grid.score(titanic_train_data_X, titanic_train_data_Y)))
+    feature_imp_sorted_gb = pd.DataFrame({'feature': list(titanic_train_data_X),
+                                           'importance': gb_grid.best_estimator_.feature_importances_}).sort_values('importance', ascending=False)
+    features_top_n_gb = feature_imp_sorted_gb.head(top_n_features)['feature']
+    print('Sample 10 Feature from GB Classifier:')
+    print(str(features_top_n_gb[:10]))
+
+    # DecisionTree
+    dt_est = DecisionTreeClassifier(random_state=0)
+    dt_param_grid = {'min_samples_split': [2, 4], 'max_depth': [20]}
+    dt_grid = model_selection.GridSearchCV(dt_est, dt_param_grid, n_jobs=25, cv=10, verbose=1)
+    dt_grid.fit(titanic_train_data_X, titanic_train_data_Y)
+    print('Top N Features Best DT Params:' + str(dt_grid.best_params_))
+    print('Top N Features Best DT Score:' + str(dt_grid.best_score_))
+    print('Top N Features DT Train Score:' + str(dt_grid.score(titanic_train_data_X, titanic_train_data_Y)))
+    feature_imp_sorted_dt = pd.DataFrame({'feature': list(titanic_train_data_X),
+                                          'importance': dt_grid.best_estimator_.feature_importances_}).sort_values('importance', ascending=False)
+    features_top_n_dt = feature_imp_sorted_dt.head(top_n_features)['feature']
+    print('Sample 10 Features from DT Classifier:')
+    print(str(features_top_n_dt[:10]))
+
+    # merge the three models
+    features_top_n = pd.concat([features_top_n_rf, features_top_n_ada, features_top_n_et, features_top_n_gb, features_top_n_dt],
+                               ignore_index=True).drop_duplicates()
+
+    features_importance = pd.concat([feature_imp_sorted_rf, feature_imp_sorted_ada, feature_imp_sorted_et,
+                                   feature_imp_sorted_gb, feature_imp_sorted_dt],ignore_index=True)
+
+    return features_top_n , features_importance
+
+
+(2) 依据我们筛选出的特征构建训练集和测试集
+
+但如果在进行特征工程的过程中，产生了大量的特征，而特征与特征之间会存在一定的相关性。太多的特征一方面会影响模型训练的速度，
+另一方面也可能会使得模型过拟合。所以在特征太多的情况下，我们可以利用不同的模型对特征进行筛选，选取出我们想要的前n个特征。
+feature_to_pick = 30
+feature_top_n, feature_importance = get_top_n_features(titanic_train_data_X, titanic_train_data_Y, feature_to_pick)
+titanic_train_data_X = pd.DataFrame(titanic_train_data_X[feature_top_n])
+titanic_test_data_X = pd.DataFrame(titanic_test_data_X[feature_top_n])
+
+
+用视图可视化不同算法筛选的特征排序
+
+rf_feature_imp = feature_importance[:10]
+Ada_feature_imp = feature_importance[32:32+10].reset_index(drop=True)
+
+# make importances relative to max importance
+rf_feature_importance = 100.0 * (rf_feature_imp['importance'] / rf_feature_imp['importance'].max())
+Ada_feature_importance = 100.0 * (Ada_feature_imp['importance'] / Ada_feature_imp['importance'].max())
+
+# Get the indexes of all features over the importance threshold
+rf_important_idx = np.where(rf_feature_importance)[0]
+Ada_important_idx = np.where(Ada_feature_importance)[0]
+
+# Adapted from http://scikit-learn.org/stable/auto_examples/ensemble/plot_gradient_boosting_regression.html
+pos = np.arange(rf_important_idx.shape[0]) + .5
+
+plt.figure(1, figsize = (18, 8))
+
+plt.subplot(121)
+plt.barh(pos, rf_feature_importance[rf_important_idx][::-1])
+plt.yticks(pos, rf_feature_imp['feature'][::-1])
+plt.xlabel('Relative Importance')
+plt.title('RandomForest Feature Importance')
+
+plt.subplot(122)
+plt.barh(pos, Ada_feature_importance[Ada_important_idx][::-1])
+plt.yticks(pos, Ada_feature_imp['feature'][::-1])
+plt.xlabel('Relative Importance')
+plt.title('AdaBoost Feature Importance')
+plt.show()
+
+
+(3) 模型融合（Model Ensemble）
+
+常见的模型融合方法有：Bagging、Boosting、Stacking、Blending。
+
+(3-1):Bagging
+
+Bagging 将多个模型，也就是多个基学习器的预测结果进行简单的加权平均或者投票。它的好处是可以并行地训练基学习器。Random Forest就用到了Bagging的思想。
+
+(3-2): Boosting
+
+Boosting 的思想有点像知错能改，每个基学习器是在上一个基学习器学习的基础上，对上一个基学习器的错误进行弥补。我们将会用到的 AdaBoost，Gradient Boost 就用到了这种思想。
+
+(3-3): Stacking
+
+Stacking是用新的次学习器去学习如何组合上一层的基学习器。如果把 Bagging 看作是多个基分类器的线性组合，那么Stacking就是多个基分类器的非线性组合。Stacking可以将学习器一层一层地堆砌起来，形成一个网状的结构。
+
+相比来说Stacking的融合框架相对前面的二者来说在精度上确实有一定的提升，所以在下面的模型融合上，我们也使用Stacking方法。
+
+(3-4): Blending
+
+Blending 和 Stacking 很相似，但同时它可以防止信息泄露的问题。
+
+Stacking框架融合:
+
+这里我们使用了两层的模型融合，Level 1使用了：RandomForest、AdaBoost、ExtraTrees、GBDT、DecisionTree、KNN、SVM ，一共7个模型，Level 2使用了XGBoost使用第一层预测的结果作为特征对最终的结果进行预测。
+
+Level 1：
+
+Stacking框架是堆叠使用基础分类器的预测作为对二级模型的训练的输入。 然而，我们不能简单地在全部训练数据上训练基本模型，产生预测，输出用于第二层的训练。如果我们在Train Data上训练，然后在Train Data上预测，就会造成标签。为了避免标签，我们需要对每个基学习器使用K-fold，将K个模型对Valid Set的预测结果拼起来，作为下一层学习器的输入。
+
+所以这里我们建立输出fold预测方法：
+
+from sklearn.model_selection import KFold
+
+# Some useful parameters which will come in handy later on
+ntrain = titanic_train_data_X.shape[0]
+ntest = titanic_test_data_X.shape[0]
+SEED = 0 # for reproducibility
+NFOLDS = 7 # set folds for out-of-fold prediction
+kf = KFold(n_splits = NFOLDS, random_state=SEED, shuffle=False)
+
+def get_out_fold(clf, x_train, y_train, x_test):
+    oof_train = np.zeros((ntrain,))
+    oof_test = np.zeros((ntest,))
+    oof_test_skf = np.empty((NFOLDS, ntest))
+
+    for i, (train_index, test_index) in enumerate(kf.split(x_train)):
+        x_tr = x_train[train_index]
+        y_tr = y_train[train_index]
+        x_te = x_train[test_index]
+
+        clf.fit(x_tr, y_tr)
+
+        oof_train[test_index] = clf.predict(x_te)
+        oof_test_skf[i, :] = clf.predict(x_test)
+
+    oof_test[:] = oof_test_skf.mean(axis=0)
+    return oof_train.reshape(-1, 1), oof_test.reshape(-1, 1)
+
 ```
