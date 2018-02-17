@@ -1,0 +1,18 @@
+多条记录写入csv
+content = re.findall(contentPat, html.text)
+#print(content)
+frame = pd.DataFrame(content)
+frame.to_csv('E:\BaiduNetdiskDownload\第14章 文本挖掘\wwxd.csv', header=False, index=False, mode='a+')
+
+
+去除重复行
+
+rFile = open('a.txt', 'r')
+wFile = open('b.txt', 'w')
+allLine = rFile.readlines()
+rFile.close()
+s = set()
+for i in allLine:
+    s.add(i)
+for i in s:
+    wFile.write(i)
