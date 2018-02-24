@@ -17,7 +17,8 @@ soft margin 软间隔 :数据中的噪点
 
 引入松弛因子 ：l - e
 
-对待低维不可分的分体的问题可以转换成高维可分的问题
+
+对待低维不可分的问题可以转换成高维可分的问题
 
 低维空间的内积值映射到高位空间的内积值
 
@@ -72,3 +73,116 @@ a · b = xa· xb + ya· yb + (xa² + ya²) · (xb² + yb²)
 如果线性不可分，你可以使用 kernel 技巧；
 然而，对文本分类而言最好只用线性 kernel。
 相比于神经网络这样更先进的算法，支持向量机有两大主要优势：更高的速度、用更少的样本（千以内）取得更好的表现。这使得该算法非常适合文本分类问题。
+
+
+
+```
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy import stats
+%matplotlib inline
+
+import seaborn as sns;sns.set()
+
+#随机数据
+from sklearn.datasets.samples_generator import make_blobs
+X, y = make_blobs(n_samples=50, centers=2, random_state=0, cluster_std=0.6)
+plt.scatter(X[:, 0], X[:, 1], c=y, s=50, cmap='autumn')
+
+#训练一个基本的SVM
+from sklearn.svm import SVC
+model = SVC(kernel='linear')
+model.fit(X, y)
+
+# 绘图函数
+def plot_svc_decision_function(model, ax=None, plot_support=True):
+    if ax is None:
+        ax = plt.gca()
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
+
+    x = np.linspace(xlim[0], xlim[1], 30)
+    y = np.linspace(ylim[0], ylim[1], 30)
+    Y, X = np.meshgrid(y, x)
+    xy = np.vstack([X.ravel(), Y.ravel()])
+    P = model.decision_function(xy).reshape(X.shape)
+
+    ax.counter(X, Y, P, colors='k',
+              levels=[-1, 0, 1], alpha=0.5,
+              linestyles=['--', '-', '--'])
+
+    if plot_support:
+        ax.scatter(model.support_vectors_[:, 0],
+                  model.support_vectors_[:, 1],
+                  s=300, linewidth=1, facecolors='none')
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+
+plt.scatter(X[:, 0], X[:, 1], c=y, s=50, cmap='autumn')
+plot_svc_decision_function(model)
+
+# 引入核函数
+from sklearn.datasets.samples_generator import make_circles
+X, y = make_circles(100, factor=.1, noise=.1)
+clf = SVC(kernel='linear').fit(X, y)
+
+plt.scatter(X[:, 0], X[:, 1], c=y, s=50, cmap='autumn')
+
+#加入径向基函数
+clf = SVC(kernel='rbf', C=1E6)
+clf.fit(X, y)
+
+X, y = make_blobs(n_samples=100, centers=2, random_state=0, cluster_std=0.8)
+plt.scatter(X[:, 0], X[:, 1], c=y, s=50, cmap='autumn')
+
+from sklearn.datasets import fetch_lfw_people
+faces = fetch_lfw_people(min_faces_per_person=60)
+print(faces.target_names)
+print(faces.images.shape)
+
+```
+
+人脸识别
+
+```
+from sklearn.datasets import fetch_lfw_people
+faces = fetch_lfw_people(min_faces_per_person=60)
+print(faces.target_names)
+print(faces.images.shape)
+
+fig, ax = plt.subplots(3, 5)
+for i, axi in enumerate(ax.flat):
+    axi.imshow(faces.images[i], cmap='bone')
+    axi.set(xticks=[], yticks=[], xlabel=faces.target_names[faces.target[i]])
+
+from sklearn.svm import SVC
+from sklearn.decomposition import PCA
+from sklearn.pipeline import make_pipeline
+
+#降维
+pca = PCA(n_components=150, whiten=True, random_state=42)
+svc = SVC(kernel='rbf', class_weight='balanced')
+model = make_pipeline(pca, svc)
+
+from sklearn.model_selection import train_test_split
+Xtrain, Xtest, ytrain, ytest = train_test_split(faces.data, faces.target, random_state=40)
+
+from sklearn.model_selection import GridSearchCV
+param_grid = {'svc__C':[1, 5, 10], 'svc__gamma':[0.0001, 0.0005, 0.001]}
+grid = GridSearchCV(model, param_grid)
+
+%time grid.fit(Xtrain, ytrain)
+
+model = grid.best_estimator_
+yfit = model.predict(Xtest)
+yfit.shape
+
+fig, ax = plt.subplots(4, 6)
+for i, axi in enumerate(ax.flat):
+    axi.imshow(Xtest[i].reshape(62, 47), cmap='bone')
+    axi.set(xticks=[], yticks=[])
+    axi.set_ylabel(faces.target_names[yfit[i]].split()[-1], color='black' if yfit[i] == ytest[i] else 'red')
+fig.suptitle('Predicted names: Incorrect names in red', size=14)
+
+```
