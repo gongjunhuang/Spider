@@ -1,0 +1,128 @@
+聚类分析
+
+聚类属于无监督学习，以往的回归、朴素贝叶斯、SVM等都是有类别标签y的，也就是说样例中已经给出了样例的分类。而聚类的样本中
+却没有给定y，只有特征x，比如假设宇宙中的星星可以表示成三维空间中的点集clip_image002[10]。聚类的目的是找到每个样本x潜在的类别y，
+并将同类别y的样本x放在一起。比如上面的星星，聚类后结果是一个个星团，星团里面的点相互距离比较近，星团间的星星距离就比较远了。
+
+K-means算法是将样本聚类成k个簇（cluster），具体算法描述如下：
+
+ k-means算法是一种很常见的聚类算法，它的基本思想是：通过迭代寻找k个聚类的一种划分方案，使得用这k个聚类的均值来代表相应各类样本时所得的总体误差最小。
+
+1、 随机选取k个聚类质心点（cluster centroids）
+
+2、 重复下面过程直到收敛 ：对于每一个样例i，计算其应该属于的类；对于每一个类j，重新计算该类的质心
+
+
+ K是我们事先给定的聚类数，c代表样例i与k个类中距离最近的那个类，c的值是1到k中的一个。质心u代表我们对属于同一个类的样本中心点的猜测，
+ 拿星团模型来解释就是要将所有的星星聚成k个星团，首先随机选取k个宇宙中的点（或者k个星星）作为k个星团的质心，然后第一步对于
+ 每一个星星计算其到k个质心中每一个的距离，然后选取距离最近的那个星团作为c，这样经过第一步每一个星星都有了所属的星团；
+ 第二步对于每一个星团，重新计算它的质心u（对里面所有的星星坐标求平均）。重复迭代第一步和第二步直到质心不变或者变化很小。
+
+ K-means面对的第一个问题是如何保证收敛，前面的算法中强调结束条件就是收敛，可以证明的是K-means完全可以保证收敛性。
+
+
+
+ 其伪代码如下：
+********************************************************************
+创建k个点作为初始的质心点（随机选择）
+当任意一个点的簇分配结果发生改变时
+       对数据集中的每一个数据点
+              对每一个质心
+                     计算质心与数据点的距离
+              将数据点分配到距离最近的簇
+       对每一个簇，计算簇中所有点的均值，并将均值作为质心
+********************************************************************
+
+我们希望代价函数最小，直观的来说，各类内的样本越相似，其与该类均值间的误差平方越小，对所有类所得到的误差平方求和，即可验证分为k类时，各聚类是否是最优的。
+
+```
+from numpy import *
+import time
+import matplotlib.pyplot as plt
+
+
+# calculate Euclidean distance
+def euclDistance(vector1, vector2):
+    return sqrt(sum(power(vector2 - vector1, 2)))
+
+# init centroids with random samples
+def initCentroids(dataSet, k):
+    numSamples, dim = dataSet.shape
+    centroids = zeros((k, dim))
+    for i in range(k):
+        index = int(random.uniform(0, numSamples))
+        centroids[i, :] = dataSet[index, :]
+    return centroids
+
+# k-means cluster
+def kmeans(dataSet, k):
+    numSamples = dataSet.shape[0]
+    # first column stores which cluster this sample belongs to,
+    # second column stores the error between this sample and its centroid
+    clusterAssment = mat(zeros((numSamples, 2)))
+    clusterChanged = True
+
+    ## step 1: init centroids
+    centroids = initCentroids(dataSet, k)
+
+    while clusterChanged:
+        clusterChanged = False
+        ## for each sample
+        for i in xrange(numSamples):
+            minDist  = 100000.0
+            minIndex = 0
+            ## for each centroid
+            ## step 2: find the centroid who is closest
+            for j in range(k):
+                distance = euclDistance(centroids[j, :], dataSet[i, :])
+                if distance < minDist:
+                    minDist  = distance
+                    minIndex = j
+
+            ## step 3: update its cluster
+            if clusterAssment[i, 0] != minIndex:
+                clusterChanged = True
+                clusterAssment[i, :] = minIndex, minDist**2
+
+        ## step 4: update centroids
+        for j in range(k):
+            pointsInCluster = dataSet[nonzero(clusterAssment[:, 0].A == j)[0]]
+            centroids[j, :] = mean(pointsInCluster, axis = 0)
+
+    print 'Congratulations, cluster complete!'
+    return centroids, clusterAssment
+
+# show your cluster only available with 2-D data
+def showCluster(dataSet, k, centroids, clusterAssment):
+    numSamples, dim = dataSet.shape
+    if dim != 2:
+        print "Sorry! I can not draw because the dimension of your data is not 2!"
+        return 1
+
+    mark = ['or', 'ob', 'og', 'ok', '^r', '+r', 'sr', 'dr', '<r', 'pr']
+    if k > len(mark):
+        print "Sorry! Your k is too large! please contact Zouxy"
+        return 1
+
+    # draw all samples
+    for i in xrange(numSamples):
+        markIndex = int(clusterAssment[i, 0])
+        plt.plot(dataSet[i, 0], dataSet[i, 1], mark[markIndex])
+
+    mark = ['Dr', 'Db', 'Dg', 'Dk', '^b', '+b', 'sb', 'db', '<b', 'pb']
+    # draw the centroids
+    for i in range(k):
+        plt.plot(centroids[i, 0], centroids[i, 1], mark[i], markersize = 12)
+
+    plt.show()
+```
+k-means算法比较简单，但也有几个比较大的缺点：
+（1）k值的选择是用户指定的，不同的k得到的结果会有挺大的不同，如下图所示，左边是k=3的结果，这个就太稀疏了，
+蓝色的那个簇其实是可以再划分成两个簇的。而右图是k=5的结果，可以看到红色菱形和蓝色菱形这两个簇应该是可以合并成一个簇的：
+
+（2）对k个初始质心的选择比较敏感，容易陷入局部最小值。例如，我们上面的算法运行的时候，有可能会得到不同的结果，如下面这两种情况。
+K-means也是收敛了，只是收敛到了局部最小值：
+
+（3）存在局限性，如下面这种非球状的数据分布就搞不定了：
+
+（4）数据库比较大的时候，收敛会比较慢。

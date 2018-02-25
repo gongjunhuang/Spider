@@ -491,3 +491,72 @@ if __name__ == '__main__':
     model.save(outp1)
     model.wv.save_word2vec_format(outp2, binary=False)
 ```
+
+
+LDA建模   主题模型
+
+格式要求：list of list
+
+```
+from gensim import corpora, models, similarities
+import gensim
+
+dictionary = corpora.Dictionary(content)
+corpus = [dictionary.doc2bow(sentence) for sentence in content]
+
+lda = models.ldamodel.LdaModel(corpus=corpus, id2word=dictionary, num_topics=20)
+
+#1号分类结果     lda.print_topic(1, topn=5)   最具代表性的5个词语
+for topic in lda.print_topics(num_topics=20, num_words=5):
+    print(topic[1])
+
+df_train = pd.DataFrame({'content':content, 'label':df_news['category']})
+df_train.head()
+# 将文字种类转换成数字种类
+label_mapping = {'汽车':1, '财经':2}
+df_train['label'] = df_train['label'].map(label_mapping)
+
+from sklearn.model_selection import train_test_split
+
+x_train, x_test, y_train, y_test = train_test_split(df_train['content'].values, df_train['lable'].values)
+
+words = []
+for line_index in range(len(x_train)):
+    try:
+        words.append(' '.join(x_train[line_index]))
+    except:
+        print(line_index, word_index)
+
+from sklearn.feature_extraction.text import CountVectorizer
+texts = ['dog cat fish', 'dog cat cat', 'fish bird', 'bird']
+cv = CountVectorizer()   # 参数 ngram_range=(1, 4)， 通常为2
+cv_fit = cv.fit_transform(texts)
+
+print(cv.get_feature_names())
+print(cv_fit.toarray())
+print(cv_fit.toarray().sum(axis=0))
+
+vec = CountVectorizer(analyzer='word', max_features=4000, lowercase=False)
+vec.fit(words)
+
+from sklearn.naive_bayes import MultinomialNB
+classifier = MultinomialNB()
+classifier.fit(vec.transform(words), y_train)
+
+test_words = []
+for line_index in range(len(x_test)):
+    try:
+        words.append(' '.join(x_test[line_index]))
+    except:
+        print(line_index, word_index)
+
+classifier.score(vec.transform(test_words), y_test)
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+vectorizer = TfidfVectorizer(analyzer='word', max_features=4000, lowercase=False)
+vectorizer.fit(words)
+from sklearn.naive_bayes import MultinomialNB
+classifier = MultinomialNB()
+classifier.fit(vec.transform(words), y_train)
+
+```
