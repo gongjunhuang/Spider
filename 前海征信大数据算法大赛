@@ -202,3 +202,8 @@ In [24]:
 res = xgb_model.predict(xgb.DMatrix(test_B[train_B_1.columns].fillna(-999)))
 test_B['pred'] = res
 test_B[['no','pred']].to_csv('submit.csv',index = None)
+
+
+HTTP异常流量检测
+
+Birch算法：增量校验，速度很快
