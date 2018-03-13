@@ -9,28 +9,36 @@ XGBoost算法可以给预测模型带来能力的提升。当我对它的表现�
 
 标准GBM的实现没有像XGBoost这样的正则化步骤。正则化对减少过拟合也是有帮助的。
 实际上，XGBoost以“正则化提升(regularized boosting)”技术而闻名。
+
 2、并行处理
 
 XGBoost可以实现并行处理，相比GBM有了速度的飞跃。
 不过，众所周知，Boosting算法是顺序处理的，它怎么可能并行呢？每一课树的构造都依赖于前一棵树，那具体是什么让我们能用多核处理器去构造一个树呢？我希望你理解了这句话的意思。如果你希望了解更多，点击这个链接。
 XGBoost 也支持Hadoop实现。
+
 3、高度的灵活性
 
 XGBoost 允许用户定义自定义优化目标和评价标准
 它对模型增加了一个全新的维度，所以我们的处理不会受到任何限制。
+
 4、缺失值处理
 
 XGBoost内置处理缺失值的规则。
-用户需要提供一个和其它样本不同的值，然后把它作为一个参数传进去，以此来作为缺失值的取值。XGBoost在不同节点遇到缺失值时采用不同的处理方法，并且会学习未来遇到缺失值时的处理方法。
+用户需要提供一个和其它样本不同的值，然后把它作为一个参数传进去，以此来作为缺失值的取值。XGBoost在不同节点遇到缺失值时
+采用不同的处理方法，并且会学习未来遇到缺失值时的处理方法。
+
 5、剪枝
 
 当分裂时遇到一个负损失时，GBM会停止分裂。因此GBM实际上是一个贪心算法。
 XGBoost会一直分裂到指定的最大深度(max_depth)，然后回过头来剪枝。如果某个节点之后不再有正值，它会去除这个分裂。
-这种做法的优点，当一个负损失（如-2）后面有个正损失（如+10）的时候，就显现出来了。GBM会在-2处停下来，因为它遇到了一个负值。但是XGBoost会继续分裂，然后发现这两个分裂综合起来会得到+8，因此会保留这两个分裂。
+这种做法的优点，当一个负损失（如-2）后面有个正损失（如+10）的时候，就显现出来了。GBM会在-2处停下来，因为它遇到了一个负值
+。但是XGBoost会继续分裂，然后发现这两个分裂综合起来会得到+8，因此会保留这两个分裂。
+
 6、内置交叉验证
 
 XGBoost允许在每一轮boosting迭代中使用交叉验证。因此，可以方便地获得最优boosting迭代次数。
 而GBM使用网格搜索，只能检测有限个值。
+
 7、在已有的模型基础上继续
 
 XGBoost可以在上一轮的结果上继续训练。这个特性在某些特定的应用上是一个巨大的优势。
@@ -304,16 +312,7 @@ gsearch3 = GridSearchCV(estimator = XGBClassifier( learning_rate =0.1, n_estimat
  param_grid = param_test3, scoring='roc_auc',n_jobs=4,iid=False, cv=5)
 gsearch3.fit(train[predictors],train[target])
 gsearch3.grid_scores_, gsearch3.best_params_, gsearch3.best_score_
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
+
 从这里可以看出来，我们在第一步调参时设置的初始gamma值就是比较合适的。也就是说，理想的gamma值为0。在这个过程开始之前，最好重新调整boosting回合，因为参数都有变化。
 gamma
 从这里可以看出，得分提高了。所以，最终得到的参数是：
@@ -331,20 +330,7 @@ xgb2 = XGBClassifier(
 scale_pos_weight=1,
 seed=27)
 modelfit(xgb2, train, predictors)
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
+
 最终参数
 
 第四步：调整subsample 和 colsample_bytree 参数
@@ -361,17 +347,7 @@ gsearch4 = GridSearchCV(estimator = XGBClassifier( learning_rate =0.1, n_estimat
  param_grid = param_test4, scoring='roc_auc',n_jobs=4,iid=False, cv=5)
 gsearch4.fit(train[predictors],train[target])
 gsearch4.grid_scores_, gsearch4.best_params_, gsearch4.best_score_
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
+
 gsearch4
 
 从这里可以看出来，subsample 和 colsample_bytree 参数的理想取值都是0.8。现在，我们以0.05为步长，在这个值附近尝试取值。
