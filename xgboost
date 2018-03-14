@@ -431,21 +431,7 @@ xgb3 = XGBClassifier(
  scale_pos_weight=1,
  seed=27)
 modelfit(xgb3, train, predictors)
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
+
 out_put3
 
 然后我们发现性能有了小幅度提高。
@@ -468,21 +454,7 @@ xgb4 = XGBClassifier(
  scale_pos_weight=1,
  seed=27)
 modelfit(xgb4, train, predictors)
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
+
 此处输入图片的描述
 此处输入图片的描述
 
@@ -497,3 +469,25 @@ modelfit(xgb4, train, predictors)
 
 这篇文章主要讲了如何提升XGBoost模型的表现。首先，我们介绍了相比于GBM，为何XGBoost可以取得这么好的表现。紧接着，我们介绍了每个参数的细节。我们定义了一个可以重复使用的构造模型的函数。
 最后，我们讨论了使用XGBoost解决问题的一般方法，在AV Data Hackathon 3.x problem数据上实践了这些方法。
+
+
+
+```
+from numpy import loadtxt
+import numpy as np
+from xgboost import XGBClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+dataset = loadtxt("", delimeter=",")
+X = dataset[:, 0:8]
+y = dataset[:, 8]
+seed = 7
+test_size = 0.33
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=seed)
+model = XGBClassifier()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+predictions = [round(value) for value in y_pred]
+accuracy = accuracy_score(y_test, predictions)
+```
