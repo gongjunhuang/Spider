@@ -1,0 +1,19 @@
+INDEX VERSION 1.127+C:\AndroidProject\Spider\java\.metadata\.plugins\org.eclipse.jdt.core
+845259415.index
+3989617939.index
+3189454595.index
+1541623662.index
+4231472205.index
+1682125335.index
+2168858273.index
+3986150638.index
+3035769013.index
+1009953515.index
+1702976355.index
+1205870092.index
+2693307933.index
+1302074016.index
+2166205085.index
+3589613700.index
+3320693805.index
+1577656496.index

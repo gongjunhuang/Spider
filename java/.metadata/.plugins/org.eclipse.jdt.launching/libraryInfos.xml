@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<libraryInfos>
+<libraryInfo home="D:\hadoop" version="1.8.0_91">
+<bootpath>
+<entry path="D:\hadoop\jre\lib\resources.jar"/>
+<entry path="D:\hadoop\jre\lib\rt.jar"/>
+<entry path="D:\hadoop\jre\lib\sunrsasign.jar"/>
+<entry path="D:\hadoop\jre\lib\jsse.jar"/>
+<entry path="D:\hadoop\jre\lib\jce.jar"/>
+<entry path="D:\hadoop\jre\lib\charsets.jar"/>
+<entry path="D:\hadoop\jre\lib\jfr.jar"/>
+<entry path="D:\hadoop\jre\classes"/>
+</bootpath>
+<extensionDirs>
+<entry path="D:\hadoop\jre\lib\ext"/>
+<entry path="C:\WINDOWS\Sun\Java\lib\ext"/>
+</extensionDirs>
+<endorsedDirs>
+<entry path="D:\hadoop\jre\lib\endorsed"/>
+</endorsedDirs>
+</libraryInfo>
+</libraryInfos>

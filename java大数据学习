@@ -1,0 +1,37 @@
+
+必须技能10条:
+01.Java高级(虚拟机、并发)
+02.Linux 基本操作
+03.Hadoop（此处为侠义概念单指HDFS+MapReduce+Yarn ）
+04.HBase（JavaAPI操作+Phoenix ）
+05.Hive(Hql基本操作和原理理解）
+06.Kafka
+07.Storm
+08.Scala需要
+09.Python
+10.Spark (Core+sparksql+Spark streaming ）
+11.一些小工具(Sqoop等)
+
+高阶技能6条:
+11.机器学习算法以及mahout库加MLlib
+12.R语言
+13.Lambda 架构
+14.Kappa架构
+15.Kylin
+16.Aluxio
+
+三.学习路径由于本人是从Java开发通过大概3个月的自学转到大数据开发的。所以我主要分享一下自己的学习路径。
+
+第一阶段:
+01.Linux学习（跟鸟哥学就ok了）
+02.Java 高级学习（《深入理解Java虚拟机》、《Java高并发实战》）
+
+第二阶段:
+03.Hadoop （董西成的书）
+04.HBase（《HBase权威指南》）
+05.Hive（《Hive开发指南》）
+06.Scala（《快学Scala》）
+07.Spark （《Spark 快速大数据分析》）
+08.Python （跟着廖雪峰的博客学习就ok了）
+
+第三阶段:对应技能需求，到网上多搜集一些资料就ok了，我把最重要的事情(要学什么告诉你了)，剩下的就是你去搜集对应的资料学习就ok了当然如果你觉得自己看书效率太慢，你可以网上搜集一些课程，跟着课程走也OK 。这个完全根据自己情况决定。如果看书效率不高就很网课，相反的话就自己看书。四.学习资源推荐:01.Apache 官网02.Stackoverflow04.github03.Cloudra官网04.Databrick官网05.过往的记忆（技术博客）06.CSDN，51CTO 07.至于书籍当当一搜会有很多，其实内容都差不多。
