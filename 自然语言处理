@@ -1,1 +1,5 @@
 Hierarchical Softmax
+
+CBOW：continous bag of Words models   是一种根据上下文的词语预测当前词语出现概率的模型
+
+哈夫曼树：带权（重要程度）长度最短的二叉树，也称为最优二叉树
