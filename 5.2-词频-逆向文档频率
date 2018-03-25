@@ -1,0 +1,158 @@
+5.2 词频-逆向文档频率
+
+5.2.1 词频-逆向文档频率
+
+在大量的文本数据中，通常会存在一些出现频率极高但是并无实际意义的词汇，如部分停用词，如果直接用这些所谓的高频词对文档进行进一步的分析处理很可能会忽略某些出现频率没有那么高的重要词汇，所以需要在词频的基础上对各个词汇的频数进一步调整，“词频-逆向文档频率”就是一种常用的调整方式。“词频-逆向文档频率”一词源自“Term Frequency–Inverse Document Frequency”，简称 TF-IDF。 TF-IDF 算法建立在以下假设之上：对某个文档最有代表性的词汇或者说对区别文档最有意义的词汇应该是那些在某个文档中出现频率高，而在整个文档集合的其他文档中出现频率少的词汇。我们在第一章简单介绍过词频-逆向文档频率的构造原理，直观来看，词频-逆向文档频率就是对文档词频矩阵的核心信息进行提取的结果，其目的在于使词汇能突出所属文档的个性化。常用的计算方式就是在文档词项矩阵（tf）的基础上进行权数（idf）调整。 假设现在有一个包含 1000 个文档的文档集合，其中包括文档：[经济，发展，新常态，研究，……]，该文档总词汇数是 100，“经济”这个词汇出现了 4 次，则“经济”一词的词频（TF）为 4/100 = 0.04，如果在 1000 个文档中有 100 个文档出现过“经济”一词，则逆向文档频率（IDF）为 log(1000/100) = 1，那么在 TF-IDF 矩阵中，该文档中“经济”一词对应的权数应为 0.04*1=0.04。
+
+5.2.2 利用 scikit-learn 库构建词频-逆向文档频率
+
+5.2.2.1 sklearn.feature_extraction.text.TfidfTransformer
+
+sklearn.feature_extraction.text 模块下定义的 TfidfTransformer 类可以将词频矩阵转换为标准化的 TF 或 TF-IDF 矩阵，用于计算文档 d 中词汇 t 的 tf-idf 值的公式为：
+
+@todo 补充公式（1）
+
+类实例化方式为：实例 = TfidfTransformer(norm=u'l2', use_idf=True, smooth_idf=True, sublinear_tf=False)
+
+参数说明：
+
+norm：指定标准化方式，有以下三种取值
+（1）l1:利用 l1 范数进行标准化
+（2) l2:利用 l2 范数进行标准化
+(3) None：不进行标准化处理
+
+use_idf：是否使用 idf 值对文档词频矩阵进行权数调整而得到 TF-IDF 矩阵，取值为 False 时 得到文档词频矩阵，即 TF 矩阵。
+
+smooth_idf：通过给文档频率加 1 来平滑 idf 权数，相当于假设有一个文档包含了所有的词汇，进而避免 idf 权数计算过程中分母为零的情况
+
+sublinear_tf：对 tf 进行线性变换，如 1+log(tf)
+
+TfidfTransformer 在默认参数设置下，idf(d,t) 计算公式为： @todo 补充公式（2）
+
+TfidfTransformer 类的 fit_transform 方法可以将文档词频矩阵转化为 TF-IDF 矩阵，调用方式为：实例.fit_transform(X)，其中 X 即为需要转化的文档词频矩阵。
+
+例 1 利用 TfidfTransformer 将文档词频矩阵转化为 TF-IDF 矩阵
+
+
+In [1]:from sklearn.feature_extraction.text import TfidfTransformer
+       transformer = TfidfTransformer()
+       transformer
+Out[1]:TfidfTransformer(norm=u'l2', smooth_idf=True, sublinear_tf=False,
+         use_idf=True)
+In [2]:tf = [[4, 0, 0],
+             [3, 2, 0],
+             [3, 0, 0],
+             [3, 0, 2]]
+       tfidf = transformer.fit_transform(tf)
+       tfidf
+Out[2]:<4x3 sparse matrix of type '<type 'numpy.float64'>'
+               with 6 stored elements in Compressed Sparse Row format>
+In [3]:tfidf.toarray()
+Out[3]:array([[ 1.        ,  0.        ,  0.        ],
+              [ 0.61638324,  0.78744632,  0.        ],
+              [ 1.        ,  0.        ,  0.        ],
+              [ 0.61638324,  0.        ,  0.78744632]])
+可以看到，在原 tf 矩阵中，第一列，即第一个词汇在不同文档中出现的次数均比较多，实际分析时应减小这类词的系数，而扩大第二个词在第二个文档、第三个词在第四个文档中的系数，通过转换为 TF-IDF 矩阵即可实现这一调整。
+
+5.2.2.2 sklearn.feature_extraction.text.TfidfVectorizer
+
+5.1 节介绍的 CountVectorizer 类可以将文档集合转换为文档词频矩阵，TfidfTransformer 类可以将文档词频矩阵转换为 TF-IDF 矩阵，而 TfidfVectorizer 类将这两个过程合并在一起，即可将原始文本数据直接转换为 TF-IDF 矩阵。实例化方式为：实例=TfidfVectorizer(input=u'content', encoding=u'utf-8', decode_error=u'strict', strip_accents=None, lowercase=True, preprocessor=None, tokenizer=None, analyzer=u'word', stop_words=None, token_pattern=u'(?u)\b\w\w+\b', ngram_range=(1, 1), max_df=1.0, min_df=1, max_features=None, vocabulary=None, binary=False, dtype=, norm=u'l2', use_idf=True, smooth_idf=True, sublinear_tf=False)
+
+参数说明可以参考 6.1.3.1 CountVectorizer 类实例化参数及 6.2.2.1 TfidfTransformer 类实例化参数。
+
+（1）fit_transform 方法
+
+fit_transform 方法可以直接将文本数据转换为 TF-IDF 矩阵，调用方式为：实例.fit_transform(raw_documents)，参数 raw_documents 即为需要准换的原始文档。
+
+例 2 将 data_samples 转换为 TF-IDF 矩阵
+
+
+In [4]:from sklearn.feature_extraction.text import TfidfVectorizer
+       vectorizer = TfidfVectorizer()
+       data_samples_tfidf=vectorizer.fit_transform(data_samples)
+       data_samples_tfidf
+Out[4]:<10x845 sparse matrix of type '<type 'numpy.float64'>'
+               with 1133 stored elements in Compressed Sparse Row format>
+In [5]:data_samples_tfidf.toarray()
+Out[5]:array([[ 0.,  0.,  0., ...,  0.,  0.,  0.],
+              [ 0.,  0.,  0., ...,  0.,  0.,  0.],
+              [ 0.,  0.,  0., ...,  0.,  0.,  0.],
+              ...,
+              [ 0.,  0.,  0., ...,  0.,  0.,  0.],
+              [ 0.,  0.,  0., ...,  0.,  0.,  0.],
+              [ 0.,  0.,  0., ...,  0.,  0.,  0.]])
+（2）get_feature_names 方法
+
+get_feature_names 方法可以获得所有特征项，即文档-词频矩阵列对应的所有词汇
+
+例 3
+
+
+In [6]:vectorizer.get_feature_names()
+Out[6]:[u'0fhmt',
+         u'0jf',
+         ……
+         u'zv',
+         u'zviq']
+5.2.3 利用 gensim 库构建词频-逆向文档频率
+
+gensim 库 models 包中的 tfidfmodel 模块下定义了构建词频-逆向文档频率矩阵的类——TfidfModel，同样通过词频（TF）和逆向文档频率（IDF）乘积得到，并对乘积进行标准化处理，对于文档 j 中词汇 i ，未经标准化处理的 tf-idf 计算公式为：weight{i,j} = wlocal(frequency{i,j}) * wglobal(documentfreq{i}, D)，其中使用者可以自行设置 wlocal 和 wglobal函数，默认wlocal为恒等式 ，使用者可以自行定义为平方根、对数等，默认wglobal为log_2(total_docs / doc_freq)。
+
+该类的实例化方式为：实例=TfidfModel(corpus=None，id2word=None, dictionary=None, wlocal=, wglobal=, normalize=True)
+
+参数说明：
+
+corpus：训练文档，取值需为 doc2bow 方法返回的类型，即以元组（词汇 id ，词频）为元素的列表，基于该参数包含的词汇构建矩阵
+
+dictionary：取值类型需为 Dictionary 类，如果通过该参数指定构建的词典，则直接使用该词典构造逆向文档频率映射，忽略已经设定的 corpus 参数
+
+wlocal：设置词频（TF）计算函数
+
+wglobal：设置逆向文档频率（IDF）计算函数
+
+normalize：是否进行标准化处理，取值为 True 时，默认标准化为单位长度
+
+实例化后通过调用“[]”方法即可得到用 tf-idf 值表示的文档向量，调用方式为：实例[corpus]，其中参数 corpus 即为需要结构化处理的文本，取值需为 doc2bow 方法返回的类型
+
+例 4
+
+
+In [7]:import gensim
+       from gensim import corpora,models
+       documents = ['This is a text mining book',
+                    'Is this a text mining book',
+                    'Text mining with python']
+        texts = [[word for word in document.lower().split()] for document in documents]
+        # 创建词典
+        dictionary = corpora.Dictionary(texts)
+        # 创建文档词频向量
+        corpus = [dictionary.doc2bow(text) for text in texts]
+        # 计算 tf-idf 值
+        tfidf_model = models.TfidfModel(corpus)
+        corpus_tfidf = tfidf_model[corpus]
+        for i in corpus_tfidf:
+            print i
+Out[7]:[(0, 0.5), (2, 0.5), (4, 0.5), (5, 0.5)]
+       [(0, 0.5), (2, 0.5), (4, 0.5), (5, 0.5)]
+       [(6, 0.7071067811865475), (7, 0.7071067811865475)]
+
+# 利用 corpus2dense 转换矩阵形式
+
+In [8]:from gensim.matutils import corpus2dense
+       corpus_matrix=corpus2dense(corpus_tfidf, len(dictionary))
+       corpus_matrix
+Out[8]:array([[ 0.5       ,  0.5       ,  0.        ],
+              [ 0.        ,  0.        ,  0.        ],
+              [ 0.5       ,  0.5       ,  0.        ],
+              [ 0.        ,  0.        ,  0.        ],
+              [ 0.5       ,  0.5       ,  0.        ],
+              [ 0.5       ,  0.5       ,  0.        ],
+              [ 0.        ,  0.        ,  0.70710677],
+              [ 0.        ,  0.        ,  0.70710677]], dtype=float32)
+
+# 转置处理
+
+In [9]:corpus_matrix.T
+Out[9]:array([[ 0.5  ,0.  ,0.5   ,0.   ,0.5   ,0.5   ,0.          ,0.        ],
+              [ 0.5  ,0.  ,0.5   ,0.   ,0.5   ,0.5   ,0.          ,0.        ],
+              [ 0.   ,0.  ,0.    ,0.   ,0.    ,0.    ,0.70710677  ,0.70710677]], dtype=float32)

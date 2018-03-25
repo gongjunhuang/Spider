@@ -1,0 +1,463 @@
+第 5 章 文本数据结构化处理
+
+虽然文本数据的分析流程与传统数据挖掘相似，但文本数据表现为非结构性、自由形态的文字，或者是由许多符合特定计算机语言的语法及语法规则构成的文字和语句的字符串，利用现有数据挖掘方法是无法直接进行分析的。抛开词频之外的复杂语义结构，挖掘过程首先要考虑将这种非结构化的数据结构化处理，常规做法就是分词、生成文档-词项矩阵，后续可能涉及到高维矩阵的处理等问题。所以，文本挖掘需要建立在文本结构化转换基础上，于结构化框架下才能进行分析，本章将重点讲解几种常用的文本数据结构化处理的方法，包括文档-词项矩阵（DTM）、词频-逆向文件频率(TF-IDF)和词向量，具体内容安排如下：5.1节主要介绍文档-词项矩阵的思想和构建方法，包括 sklearn 和 gensim 库的相关模块、类方法等；5.2节进一步讲解最为常用的提取文本数据核心信息的统计方法：词频-逆向文件频率，分别介绍了使用 sklearn 和 gensim 库计算词频-逆向文件频率的方法；在 5.3 节引入词向量这一更加高级的文本数据结构化处理方法，重点说明利用 word2vec 工具包进行词向量训练的方法；最后 5.4 节结合实际案例讲解了相关 Python 工具的使用方法。
+
+5.1 文档-词项矩阵
+
+5.1.1 词袋模型简介
+
+“词袋模型”一词源自“Bag of words”，简称 BOW ，是构建文档-词项矩阵的基本思想。对于给定的文本，可以是一个段落，也可以是一个文档，该模型都忽略文本的词汇顺序和语法、句法，假设文本是由无序、独立的词汇构成的集合，这个集合可以被直观的想象成一个词袋，袋子里面就是构成文本的各种词汇。例如，文本内容为“经济发展新常态研究”的文档，用词袋模型可以表示为[经济，发展，新常态，研究]四个独立的词汇。词袋模型对于词汇的独立性假设，简化了文本数据结构化处理过程中的计算，被广泛采用，但是另一方面，这种假设忽略了词汇之间的顺序和依赖关系，降低了模型对文本的代表性。
+
+5.1.2 文档-词项矩阵
+
+“文档-词项矩阵”一词源自“Document-Term Matrix”，简称 DTM，DTM 矩阵转置后即为 TDM。 我们在第一章简单介绍过文档-词项矩阵的构成，直观来看，矩阵的行代表文档，列代表词汇，矩阵元素即为文档中某一词汇出现的次数。例如，有以下两个文档：文档一[经济，发展，新常态，研究]，文档二[大数据，安全，隐私，保护]，基于这两个文档构造一个词典：{1:”经济”, 2. “发展”, 3. “新常态”, 4. “研究”, 5. “大数据”, 6. “安全”, 7. “隐私”，8. “保护”}，这个词典一共包含 8 个不同的词汇，利用词典的索引号，上面两个文档都可以用一个 8 维的向量表示：（1,1, 1,1,0,0,0,0）和（0,0,0,0,1,1,1,1），向量元素表示对应维度的词汇在文档中出现的次数，两个向量合并在一起即得到文档-词项矩阵。
+
+虽然文档-词项矩阵没有考虑到词汇之间的依存关系，但是这一简单假设也大大简化了后续文本挖掘的计算过程，利用结构化处理的文档-词项矩阵已经可以实现很多有意义的分析过程，如计算文档之间的相关性、文本分类、文本聚类等等。
+
+5.1.3 利用 scikit-learn 库构建文档-词频矩阵
+
+除了常用的机器学习算法外，scikit-learn 库还提供了很多数据结构化处理的工具，将这类结构化处理统称为“Feature Extraction”，即“特征抽取”，文本中的词汇出现的次数就属于“特征”中的一种。通过 sklearn.feature_extraction 包实现相关操作，该包包括从文本和图像中进行特征抽取的方法。
+
+5.1.3.1 sklearn.feature_extraction.text.CountVectorizer
+
+sklearn.feature_extraction.text 是 sklearn.feature_extraction 包中进行文本数据结构化处理的模块，其中定义的 CountVectorizer 类可以同时实现分词处理和词频统计，并得到文档-词频矩阵。 实例化方式为：实例=CountVectorizer(input=u'content', encoding=u'utf-8', decode_error=u'strict', strip_accents=None, lowercase=True, preprocessor=None, tokenizer=None, stop_words=None, token_pattern=u'(?u)\b\w\w+\b', ngram_range=(1, 1), analyzer=u'word', max_df=1.0, min_df=1, max_features=None, vocabulary=None, binary=False, dtype=)
+
+参数说明：
+
+input：有以下三种取值类型
+（1）filename：文本内容的文件名
+（2）file：有“read”方法的对象，如 file 对象
+（3）content：需要处理的文本
+
+encoding：解码参数，默认取值为“utf-8”
+
+decode_error：若需要分析的字符串中包含未能解码字符，可以利用该参数设置处理方案，有以下三种方案:
+（1）strict：默认缺失值，出现异常报错
+（2）ignore：忽略异常情况
+（3）replace
+
+analyzer：指定特征项为词(word)还是 n-grams 字符（按照 n 个字符对语句进行划分），有以下几种取值:
+（1）word：指定特征项为词
+（2）char：指定特征项为 n-grams 字符
+（3）char_wb：仅从文本中词边界创建 n-gram 字符
+如果传递一个用来提取特征的可调用函数，那么就按照被传递的函数进行处理
+
+preprocessor：利用可调用函数改写预测处理函数，同时保留分词和 n-grams 的处理过程，默认缺失值为“None”
+
+tokenizer：利用可调用函数改写分词步骤，同时保留预处理和 n-grams 的处理过程，默认缺失值为“None”
+
+ngram_range：设置 n-gram 字符中 “n" 上下界的参数，取值类型为数组(min_n, max_n)，所有 min_n <= n <= max_n 的 n 值都会被使用
+
+stop_words：停用词设置参数，有以下三种取值:
+（1）字符串“english”：使用内建的英文停用词表
+（2）自定义停用词列表：列表中词汇将会从分词结果中删除，只有当参数 analyzer == 'word' 时才可以进行此项设置
+（3）None：不使用停用词，可以将参数 max_df 取值设置为 [0.7, 1.0) 基于内部语料库词频自动识别、过滤停用词
+
+lowercase：在分词前是否将所有字符都转换为小写形式，默认缺失值为 “True”
+
+token_pattern：规定分词原理的正则表达式，仅在 analyzer == ‘word’ 时才可设置。默认的正则表达式是选择两个或者两个以上的字符（忽略标点符号，将其作为分词依据）
+
+max_df：阈值参数，构建字典时，忽略词频明显高于该阈值（语料库的停用词）的词项。如果参数取值是浮点数，则代表了文档比例，如果是整数，则代表计数值。当字典非空时，这个参数会被忽略。
+
+min_df：阈值参数，构建字典时，忽略词频明显低于该阈值的词项，也被成为截止值。如果参数取值是浮点数，则代表了文档比例，如果是整数，则代表计数值。当字典非空时，这个参数会被忽略。
+
+max_features：如果该参数取值非 None，构建词典的时候仅仅考虑语料库里词频最高的那些特征，如果词典非空，这个参数将被忽略。
+
+（1）fit_transform 方法
+
+对 CountVectorizer 类调用 fit_transform 方法可以得到文档词项矩阵，调用方式为：实例.fit_transform(raw_documents)，raw_documents 即为需要结构化处理的字符串或 file 对象。
+
+下面将以 20 Newsgroups 数据库（http://www.qwone.com/~jason/20Newsgroups/）的数据进行说明，20 Newsgroups 数据库中包括大概 20000 个新闻报道文档，约覆盖 20 类不同的新闻报道，常用于进行文本分类和聚类分析。各位读者可以在先从网上下载数据集，再进行解压处理。 下面的例子中，我们将使用 sklearn 内建函数 fetch_20newsgroups 加载 20 newsgroups 数据集，该函数定义在 sklearn.datasets.twenty_newsgroups 模块下，调用方式为：fetch_20newsgroups(data_home=None, subset='train', categories=None, shuffle=True, random_state=42, remove=(), download_if_missing=True)
+
+参数说明：
+
+data_home：可选参数，用于指定数据集下载和缓存的文件夹。默认缺失值为 None，数据将保存在 '~/scikit_learn_data'子文件夹。
+
+subset：可选参数，用于选择训练数据或测试数据，“train”表示训练集，“test”表示测试集，“all”表示两者均有，且为乱序。
+
+categories：有以下两种取值情况
+（1）None（默认缺失值）：下载所有类别的新闻数据
+（2）类别名称列表：只下载列表中类别的新闻数据，其他类别不下载
+
+shuffle：可选参数，用于指定是否随机抽取数据，在模型假设样本独立同分布（i.i.d.）时，比如随机梯度下降算法，需要进行随机抽取。
+
+random_state：numpy 随机数生成器，用于随机抽取数据。
+
+download_if_missing：可选参数，默认缺失值为 True，若取值为 False，当数据本地不可用时，将产生 IOError 错误，而不是继续尝试从源站点下载数据。
+
+remove：取值可以是元组（'headers', 'footers', 'quotes'）的任何子集，子集中的元素将会被识别并从数据集中移除，防止直接使用元数据进行分类造成的过拟合。其中。“headers”移除头文件，“footers”用于移除数据结尾类似签名的部分，“quotes”用于移除引用另一篇文章的部分。
+
+例 1 从 20 Newsgroups 数据库下载实验数据
+
+
+In [1]:import sklearn
+       from sklearn.datasets import fetch_20newsgroups
+       dataset = fetch_20newsgroups(shuffle=True, random_state=1,remove=('headers', 'footers', 'quotes'))
+       dataset
+Out[1]:{'DESCR':None,
+        'data': [u"Well i'm not sure …… It is unfortunate.\n",
+                 u"\n\n\n\n\n\n\nYeah, …… III",
+                 ...],
+        'description':'the 20 newsgroups by date dataset',
+        'filenames':array(['……'], dtype='|S97'),
+        'target':array([17,  0, 17, ...,  9,  4,  9]),
+        'target_names':['alt.atheism','comp.graphics',……'talk.politics.misc','talk.religion.misc']} # 新闻文本保存在键 “data” 对应的列表内，“target”对应新闻类型，“target_names”为不同新闻类型名称
+In [2]:dataset.keys() # 查看数据集字典的键
+Out[2]:['description', 'DESCR', 'filenames', 'target_names', 'data', 'target']
+In [3]:len(dataset.data) # 查看文本数
+Out[3]:11314
+In [4]:data_samples = dataset.data[:10] # 选取 10 条新闻文本作为分析实例
+In [5]:data_samples
+Out[5]:[u"Well i'm not sure …… It is unfortunate.\n",
+        u"\n\n\n\n\n\n\nYeah, …… III",
+        ……
+        u"\n  I was wondering …… for any insight.\n"]
+例 2 获得 data_samples 文档-词频矩阵
+
+
+In [6]:from sklearn.feature_extraction.text import CountVectorizer
+       dtm_vectorizer = CountVectorizer()
+       dtm = dtm_vectorizer.fit_transform(data_samples)
+       dtm
+Out[6]:<10x845 sparse matrix of type '<type 'numpy.int64'>'
+        with 1133 stored elements in Compressed Sparse Row format> # dtm 为 10x845 的稀疏矩阵
+In [7]:print dtm
+       (0, 797)    1
+       (0, 498)    3
+       (0, 712)    1
+        :    :
+       (9, 153)    1
+       (9, 684)    1
+       (9, 726)    1
+       (9, 359)    1
+在以上输出结果中，每一行都以“ （i,j） x ”的形式存在，其中，i 表示第 i 条新闻，j 表示词汇 id，x 表示词汇 j 在新闻 i 中出现的次数。转换为常用的矩阵形式如下：
+
+
+In [8]:dtm.toarray()
+Out[8]:array([[0, 0, 0, ..., 0, 0, 0],
+              [0, 0, 0, ..., 0, 0, 0],
+              [0, 0, 0, ..., 0, 0, 0],
+              ...,
+              [0, 0, 0, ..., 0, 0, 0],
+              [0, 0, 0, ..., 0, 0, 0],
+              [0, 0, 0, ..., 0, 0, 0]])
+由显示的元素值均为 0 也可以看出矩阵的稀疏性
+
+（2）vocabulary_ 属性
+
+可以利用字典属性 vocabulary_ 查看词汇对应的 id，查看方式与字典一致。
+
+例 3
+
+
+In [9]:dtm_vectorizer.vocabulary_.get("sure")
+Out[9]:712
+（3）get_feature_names 方法
+
+利用 get_feature_names 方法可以获得所有特征项，即文档-词频矩阵列对应的所有词汇
+
+例 4
+
+
+In [10]:dtm_vectorizer.get_feature_names()
+Out[10]:[u'0fhmt',
+         u'0jf',
+         ……
+         u'zv',
+         u'zviq']
+（4）inverse_transform 方法
+
+inverse_transform 方法用于返回文档-词频矩阵中每个文档的非零的词项，调用方式为：实例.inverse_transform(DTM)，DTM 即需要统计文档非零词项的文档-词频矩阵
+
+例 5
+
+
+In [11]:dtm_vectorizer.inverse_transform(dtm)
+Out[11]:[array([u'well', u'not', u'sure', ……u'power', u'unfortunate'], dtype='<U25'),
+         ……
+         array([u'about', u'the', u'it', …… u'thanks',u'insight'], dtype='<U25')]
+词袋模型的一个缺点就是其忽略了语句中词汇的顺序及语法关系，如以下两句话：“This is a text mining book.” 和 “Is this a text mining book?”，两句话由相同的词汇组成，文档-词频矩阵中对应的向量表示也应该是一样的，但是表达的语意不同，为了避免丢失这部分信息，我们可以同时采用 1-grams（单个词汇）和 2-grams（两个词汇组成的词组） 的分词方法来构建文档-词频矩阵
+
+例 6
+
+
+In [12]:corpus = ['This is a text mining book.',
+                  'Is this a text mining book?',
+                  'Text mining with python.']
+        vectorizer = CountVectorizer()
+        X = vectorizer.fit_transform(corpus)
+        X
+Out[12]:<3x7 sparse matrix of type '<type 'numpy.int64'>'
+         with 14 stored elements in Compressed Sparse Row format>
+In [13]:X.toarray()
+Out[13]:array([[1, 1, 1, 0, 1, 1, 0],
+               [1, 1, 1, 0, 1, 1, 0],
+               [0, 0, 1, 1, 1, 0, 1]])
+从以上文档-词频矩阵结果可以看出，前两行向量完全相同，下面同时采用 1-grams 和 2-grams 构建文档-词频矩阵：
+
+
+In [14]:bigram_vectorizer = CountVectorizer(ngram_range=(1, 2))
+        X_2 = bigram_vectorizer.fit_transform(corpus).toarray()
+        X_2
+Out[14]:array([[1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0],
+               [1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0],
+               [0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1]])
+In [15]:bigram_vectorizer.get_feature_names()
+Out[15]:[u'book',u'is',u'is text',u'is this',u'mining',u'mining book',u'mining with',u'python',u'text',u'text mining',u'this',u'this is',u'this text',u'with',u'with python']
+从以上文档-词频矩阵结果可以看出，引入 2-grams 后，前两行向量得以区分开来，但是向量的维度也有所增加。
+
+5.1.3.2 sklearn.feature_extraction.text.HashingVectorizer
+
+利用 CountVectorizer 类构建文档词频矩阵时，需要调用两次文档集合，一次用于创建词典，一次用于创建每个文档对应的词频向量，两次调用会导致内存消耗较大。HashingVectorizer 类通过哈希（hashing）技巧，不创建字典，有效的缓解了这一问题。HashingVectorizer 类实例化方式为：实例=HashingVectorizer(input=u'content', encoding=u'utf-8', decode_error=u'strict', strip_accents=None, lowercase=True, preprocessor=None, tokenizer=None, stop_words=None, token_pattern=u'(?u)\b\w\w+\b', ngram_range=(1, 1), analyzer=u'word', n_features=1048576, binary=False, norm=u'l2', non_negative=False, dtype=)
+
+部分参数说明：
+
+n_features：用于设置输出矩阵的列数，数值过小可能会引起哈希冲突，数值过大会导致维度过高
+
+norm：指定标准化矩阵的方式，有以下三种取值
+（1）l1:利用 l1 范数进行标准化
+（2) l2:利用 l2 范数进行标准化
+(3) None：不进行标准化处理
+
+non_negative：输出矩阵中是否只包括非负值，取值为 True 时，矩阵元素可以理解为频率，取值为 False 时，输出结果期望值为零
+
+其余参数说明可以参考 5.1.3.1 CountVectorizer 类实例化参数。
+
+对 HashingVectorizer 类调用 fit_transform 方法即可得到哈希文档词频矩阵
+
+例 7
+
+
+In [16]:from sklearn.feature_extraction.text import HashingVectorizer
+        hashing_vectorizer = HashingVectorizer(n_features=500)
+        hashing_dtm=hashing_vectorizer.fit_transform(data_samples)
+        hashing_dtm
+Out[16]:<10x500 sparse matrix of type '<type 'numpy.float64'>'
+                with 955 stored elements in Compressed Sparse Row format>
+In [17]:hashing_dtm.toarray()
+Out[17]:array([[0.        ,0.        ,0.        ,…,0.        ,0.        , 0.        ],
+               [0.        ,0.        ,0.        ,…,0.        ,0.        , 0.        ],
+               [0.        ,0.        ,0.        ,…,0.17556172,0.        , 0.05852057],
+               ...,
+               [0.        ,0.        ,0.        ,…,0.        ,0.        , 0.        ],
+               [0.        ,0.        ,0.        ,…,0.        ,0.        , 0.        ],
+               [0.        ,0.        ,0.        ,…,0.        ,0.05652334,-0.05652334]])
+5.1.3.3 sklearn.feature_extraction.DictVectorizer 模块
+
+有时对文本数据进行分词和词频统计汇总后，得到的结果会直接以键、值的形式存储为字典格式，例如文档“text mining text analysis”，可以存储为 {'text': 2, 'mining': 1, 'analysis': 1} ，如何将此种类型的文本分析结果转换为 DTM 呢？
+
+DictVectorizer 模块下定义的 DictVectorizer 类可以将字典形式的特征表示转换为 Numpy 数组形式，对于分类变量采用“one-hot coding”表示。对于“one-hot coding”可以这样理解：如果分类变量有 A、B、C 三个取值，利用“one-hot coding”可以依次表示为(1,0,0)、(0,1,0)、(0,0,1)，相当于统计学中的虚拟变量。DictVectorizer 类实例化方式为：实例=DictVectorizer(dtype=, separator='=', sparse=True, sort=True)
+
+参数说明：
+
+dtype：可选变量，特征值数据类型，通过该参数传入 Numpy array 或 scipy.sparse 矩阵构造器
+
+separator：可选变量，构建新的“one-hot coding”特征值时使用的分隔符
+
+sparse：可选变量，是否生成 scipy.sparse 矩阵
+
+sort：可选变量，是否输出 featurenames 和 vocabulary 两个属性，属性 feature_names 是特征名称列表，对应文档中的词汇项，vocabulary_ 是特征名称与相应 id 的字典
+
+（1）fit_transform 方法
+
+对 DictVectorizer 类调用 fit_transform 方法可以实现特征表示的数组形式转换，调用方式为：实例.fit_transform(X)，X 即为需要转换的字典类型的特征表示。比如在下例中，measurements 是以字典存储的特征表示，其中“city”属于分类变量，“temperature”属于数值型变量，现要将其转换为数组形式。
+
+例 8
+
+
+In [18]:measurements = [{'city': 'Dubai', 'temperature': 33.},
+                        {'city': 'London', 'temperature': 12.},
+                        {'city': 'San Fransisco', 'temperature': 18.}]
+       from sklearn.feature_extraction import DictVectorizer
+       vec = DictVectorizer(sparse=False)
+       measurements_vec=vec.fit_transform(measurements)
+       measurements_vec
+Out[18]:array([[  1.,   0.,   0.,  33.],
+               [  0.,   1.,   0.,  12.],
+               [  0.,   0.,   1.,  18.]])
+In [19]:vec.vocabulary_
+Out[19]:{'city=Dubai': 0, 'city=London': 1, 'city=San Fransisco': 2, 'temperature': 3}
+例 9
+
+假设有 A、B 两个文档，文档 A 用词袋模型表示为 {'text': 1, 'mining': 2}，即文档中“text”出现了一次，“mining”出现了两次，类似的，文档 B 表示为 {'Python': 3, 'text': 1}，现需要得到两个文档的文档-词项矩阵：
+
+
+In [20]:D = [{'text': 1, 'mining': 2}, {'Python': 3, 'text': 1}]
+        X = vec.fit_transform(D)
+        X
+Out[20]:array([[ 0.,  2.,  1.],
+               [ 3.,  0.,  1.]])
+得到的结果结即为 DTM ，查看每个维度的词汇项：
+
+
+In [21]:vec.vocabulary_
+Out[21]:{'Python': 0, 'mining': 1, 'text': 2}
+(2) inverse_transform 方法
+
+inverse_transform 方法是 fit_transform 的逆方法，调用方式为：实例.inverse_transform(Y)，其中 Y 是需要转换为字典类型特征表示的数组
+
+例 10
+
+
+In [22]:vec.inverse_transform(X)
+Out[22]:[{'mining': 2.0, 'text': 1.0}, {'Python': 3.0, 'text': 1.0}]
+5.1.4 利用 gensim 库构建文档-词频矩阵
+
+gensim 库 corpora 包的 dictionary 模块提供了文本数据结构化处理的一系列工具，其中 Dictionary 是 dictionary 模块下定义的类，可以实现词汇和词汇 id 之间的映射，即词典，该类的方法 doc2bow 可以将文本词汇集合转换为词袋模型表示形式，以列表形式返回，列表元素为 (词汇 id , 词频)的元组。要将原始文档转换为词频矩阵，首先要将各文档分词，从字符串转化为单词列表，再统计各文档单词，生成词典(Dictionary)，最后利用词典方法 doc2bow 将文档转化成词频表示的向量。
+
+5.1.4.1 构建词典
+
+在构建词典之前，首先需要对文档进行分词、停用词过滤、词干化等处理得到各个文档的词汇集合，在此基础上构建词典。本部分以例 6 中的文本集合 corpus 为例说明词典的构建步骤。
+
+
+In [1]:import gensim
+       from gensim import corpora
+       corpus = ['This is a text mining book',
+                 'Is this a text mining book',
+                 'Text mining with python']
+
+       # 此处只进行了简单的分词处理
+       texts = [[word for word in document.lower().split()] for document in corpus]
+
+       # 生成词典
+       dictionary = corpora.Dictionary(texts)
+（1）词典查看方法
+
+生成词典后，利用 keys 方法可以查看所有词汇 id，利用 values 方法可以查看所有词汇
+
+
+In [2]:dictionary.keys()
+Out[2]:[0, 1, 2, 3, 4, 6, 5, 7]
+In [3]:dictionary.values()
+Out[3]:[u'a', u'mining', u'this', u'text', u'is', u'python', u'book', u'with']
+In [4]:print dictionary.items()
+Out[4]:[(0, u'a'), (1, u'mining'), (2, u'this'), (3, u'text'), (4, u'is'), (6, u'python'), (5, u'book'), (7, u'with')]
+（2）词典过滤方法
+
+对于构建好的词典，可以对其中不满足某些条件的词汇过滤掉，常用的方法有以下几种：
+
+（2.1）filter_tokens
+
+filter_tokens 方法可以用于删除或保留词典中指定 id 的词汇，并重新分配词汇 id ，调用方式为：Dictionary.filter_tokens(bad_ids=None, good_ids=None)
+
+参数说明：
+
+bad_ids：需要从词典中删除的词汇 id 的集合
+
+good_ids：需要保留的词汇 id 集合，同时删除其他词汇
+
+
+In [5]:dictionary.filter_tokens(bad_ids=[0,4])
+       print dictionary.items()
+Out[5]:[(0, u'mining'), (1, u'this'), (2, u'text'), (3, u'python'), (4, u'book'), (5, u'with')]
+（2.2）filter_n_most_frequent
+
+filter_n_most_frequent 方法用于删除文档中出现次数最多的几个词汇，调用方式为：Dictionary.filter_n_most_frequent(remove_n)，其中参数 remove_n 即为需要删除的出现次数最多的词汇的个数。
+
+
+In [6]:dictionary.filter_n_most_frequent(1)
+       print dictionary.items()
+Out[6]:[(0, u'this'), (1, u'text'), (2, u'book'), (3, u'with'), (4, u'python')]
+（2.3）filter_extremes
+
+在 filter_extremes 方法中可以定义更加复杂的过滤方式，其调用方式为：Dictionary.filter_extremes(no_below=5, no_above=0.5, keep_n=100000)。
+
+参数说明：
+
+no_below：若包含某词汇的文档少于 no_below 个，该词汇将被删除
+
+no_above：若包含某词汇的文档在所有文档中占比大于 no_above ，该词汇将被删除
+
+keep_n：经过参数 no_below 和 no_above 的过滤后，保留频率最高的前 keep_n 个词汇，取值为 None 时，表示保留全部词汇
+
+（3）词典扩充方法
+
+（3.1）merge_with
+
+merge_with 方法用于字典合并，调用方式为：Dictionary.merge_with(new_dictionary)，其中参数 new_dictionary 即为其待合并新词典，两个词典中共同出现的词汇将会映射到相同的 id，新词典中新出现的词汇将会映射到新 id，
+
+
+In [7]:corpus1 = ['This is a text mining book',
+                  'Is this a text mining book',
+                  'Text mining with sklearn']
+       texts1 = [[word for word in document.lower().split()] for document in corpus1]
+       dict1 = corpora.Dictionary(texts1)
+       corpus2 = ['That is a text mining book',
+                  'Is that a text mining book',
+                  'Text mining with gensim']
+       texts2 = [[word for word in document.lower().split()] for document in corpus2]
+       dict2 = corpora.Dictionary(texts2)
+       dict2_to_dict1 = dict1.merge_with(dict2)
+       dict2_to_dict1
+Out[7]:<gensim.models.VocabTransform at 0x7f5bab786e50>
+（3.2）add_documents
+
+add_documents 方法可以用新的文档内容更新现有的词典，同样，新的文档形式需为词汇列表，调用方式为：Dictionary.add_documents(documents, prune_at=2000000)
+
+参数说明：
+
+documents：待更新文档，需转化为词汇列表
+
+prune_at：用于限制词典大小，保证总词汇数小于等于 prune_at ，当文档规模极大时，是一种节省内存的好方法，取值为 None 时，保留所有词汇。
+
+
+In [8]:documents1 = ['This is a text mining book',
+                     'Is this a text mining book']
+       dict = corpora.Dictionary([[word for word in document.lower().split()] for document in documents1])
+       dict.values()
+Out[8]:[u'a', u'mining', u'this', u'text', u'is', u'book']
+In [9]:documents2 = ['Text mining with sklearn',
+                     'Text mining with gensim']
+       dict.add_documents([[word for word in document.lower().split()] for document in documents2])
+       dict.values()
+Out[9]:[u'a',u'mining',u'this',u'text',u'is',u'book',u'with',u'gensim',u'sklearn']
+5.1.4.2 构建文档-词频矩阵
+
+利用 doc2bow 方法可以在构建的词典基础上得到文档词频矩阵，调用方式为：Dictionary.doc2bow(document, allow_update=False, return_missing=False)
+
+参数说明：
+
+document：需要结构化处理的文档，需转化为词汇列表的形式
+
+allow_update：取值为 True 时，允许在处理过程中更新词典，为新词汇映射新的 id
+
+return_missing：是否返回缺失值
+
+
+In [10]:corpus = ['This is a text mining book',
+                  'Is this a text mining book',
+                  'Text mining with python']
+        texts = [[word for word in document.lower().split()] for document in corpus]
+        dictionary = corpora.Dictionary(texts)
+        word_count = [dictionary.doc2bow(text) for text in texts]
+        word_count
+Out[10]:[[(0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1)],
+         [(0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1)],
+         [(1, 1), (3, 1), (6, 1), (7, 1)]]
+以上得到的结果并不是常见的矩阵形式，即行代表文档，列代表词汇，元素为词频值，gensim 库 matutils 模块提供了 corpus2dense 函数对上述结果进行转换，需要注意的是，该函数转换结果的列代表文档，需要进一步进行转置处理。调用方式为： corpus2dense(corpus, num_terms, num_docs=None, dtype=)
+
+参数说明：
+
+corpus：需要转换的矩阵
+
+num_terms：特征值个数，即词汇数
+
+num_docs：文档数
+
+
+In [11]:from gensim.matutils import corpus2dense
+        corpus_matrix=corpus2dense(word_count, len(dictionary))
+        corpus_matrix
+Out[11]:array([[ 1.,  1.,  0.],
+               [ 1.,  1.,  1.],
+               [ 1.,  1.,  0.],
+               [ 1.,  1.,  1.],
+               [ 1.,  1.,  0.],
+               [ 1.,  1.,  0.],
+               [ 0.,  0.,  1.],
+               [ 0.,  0.,  1.]], dtype=float32)
+# 转置处理
+In [12]:corpus_matrix.T
+Out[12]:array([[ 1.,  1.,  1.,  1.,  1.,  1.,  0.,  0.],
+               [ 1.,  1.,  1.,  1.,  1.,  1.,  0.,  0.],
+               [ 0.,  1.,  0.,  1.,  0.,  0.,  1.,  1.]], dtype=float32)

@@ -1,0 +1,160 @@
+5.3 词向量
+
+5.3.1 词向量
+
+不知道读者是否还有印象，作为阅读全书的基本知识准备，我们在 1.2 节曾简单介绍过文本数据分析的相关概念，其中就包括词向量的基本概念，为了使读者对词向量有更加直观和深入的理解，本部分将结合具体的例子对词向量的由来和原理做进一步的说明。
+
+本章的前两节提供了文本数据结构化处理的两种方式，一个是文档-词项矩阵，另一个是词项-逆文档频率矩阵，这两种方式的共同点在于：把文档看成词汇的集合，对于每个词汇赋予一个系数，可以是词汇出现的次数，也可以是每个词汇对应的 tf-idf 值，最终每一个文档都可以表示成由这些系数构成的数值向量。下面要介绍的词向量与以上两种方式有所不同，词向量是将每一个词汇用数值向量进行表示的文本数据结构化方式。
+
+词向量的发展过程经历了从 one-hot representation 到 distributed representation 的过程。one-hot representation 将词汇表示为数值向量，该向量的长度为文档集合中所有词汇构成的词典的大小，向量的元素只有一个为 1，其他全部为 0，1 的位置对应该词在词典中的位置。
+
+比如，有以下文档集合：
+
+文档一：我/爱/文本/分析
+文档二：Python/文本/数据/分析
+文档三：文本/数据/分析/指南
+
+该文档集合对应的词典为{我，爱，文本，分析，Python，数据，指南}，词典中的每个词对应的 one-hot representation 为：
+
+我 ——>（1，0，0，0，0，0，0）
+爱 ——>（0，1，0，0，0，0，0）
+文本 ——>（0，0，1，0，0，0，0）
+分析 ——>（0，0，0，1，0，0，0）
+Python——>（0，0，0，0，1，0，0）
+数据 ——>（0，0，0，0，0，1，0）
+指南 ——>（0，0，0，0，0，0，1）
+
+one-hot representation 是自然语言处理中最为直观和常用的词汇表示方法，但该种表达方式存在两个缺点：一是容易受维数灾难的困扰，二是不能很好地刻画词与词之间的关系。为了克服 one-hot representation 的不足，Hinton 于 1986 年提出了 Distributed Representation 方法。该方法通过训练（常用神经网络的方法）将某种语言中的每一个词映射成一个固定长度的短向量（相对于one-hot representation的“长”而言，维度以50维和100维比较常见），将所有这些向量放在一起形成一个词向量空间，而每一向量则为该空间中的一个点，在这个空间上引入“距离”，可以用最传统的欧氏距离来衡量，也可以用 cos 夹角来衡量，就可以根据词之间的距离来判断它们之间的（词法、语义上的）相似性，也就是说，如果两个词在语义上接近，那么这两个词的词向量的夹角越小，夹角余弦值越大；另一个是 Distributed Representation 词向量具有“可加性”，经过训练得到的词向量可以得到类似这样的效果：“英国-伦敦=法国-巴黎”、“女王-女=国王-男”。所以说 distributed representation 在维度和语义两个层面上都弥补了 one-hot representation 的不足。用 Distributed representation 表示词汇的方式，通常被称为“Word Representation”或“Word Embedding”，也就是中文俗称的“词向量”。本书提到的所有“词向量”均指用 Distributed Representation 表示的词向量。
+
+5.3.2 word2vec
+
+word2vec 是 Google 于 2013 年发布的一个用于获取 Word Embedding 的工具包，它简单、高效，使训练速度大为提升，因此引起了很多人的关注。word2vec 的实现模型有两种：连续词袋模型(Continuous Bag of Words，简称 CBOW)和 Skip-Gram 模型，每个模型的训练方法又分别有两种，hierarchical sofmax 与 negative sampling。算法上这两个模型是相似的，都利用人工神经网络作为它们的分类算法，最初每个单词都是一个随机 N 维向量，训练时，利用 CBOW 或者 Skip-Gram 获得每个单词的最优向量，差别在于，CBOW 是根据上下文来预测当前词语的概率, Skip-Gram 刚好相反，根据当前词语来预测上下文的概率。Skip-Gram 模型在处理大规模数据集时结果更为准确。
+
+5.3.3 利用 gensim 库训练词向量
+
+gensim 库 models 包提供的 word2vec 模块下定义的 Word2Vec 类可以快速、方便的实现词向量的训练，其最初的训练算法移植自 Google word2vec C 语言包，并拓展了更多的功能。该类的实例化或者说模型的初始化方式为： 实例=Word2Vec(sentences=None, size=100, alpha=0.025, window=5, min_count=5, max_vocab_size=None, sample=0.001, seed=1, workers=3, min_alpha=0.0001, sg=0, hs=0, negative=5, cbow_mean=1, hashfxn=, iter=5, null_word=0, trim_rule=None, sorted_vocab=1, batch_words=10000)
+
+常用参数说明：
+
+sentences：参数取值应为可迭代对象，其中的元素为字符串列表，利用该参数对模型进行初始化，若不提供该参数，则不对模型进行初始化处理
+
+size：用于定义词向量维度，默认取值为“100”
+
+alpha：初始学习率，在训练过程中会随参数“min_alpha”线性递减
+
+window：用于设置一个文档中目标词汇和预测词汇之间的最大距离
+
+min_count：在训练过程中忽略所有出现频数小于该值的词汇，默认值为“5”
+
+max_vocab_size：利用该参数控制词汇数量，以便在训练过程中对内存进行控制，如果词汇数超出该值，则删除出现频数少的词汇，一般情况下，每 1000 万单词大概需要占用 1GB 内存，默认取值为“None”，即不限制词汇数上限
+
+sample：控制高频词汇随机采样概率的阈值
+
+seed：随机数生成器，初始化词向量
+
+workers：控制训练的并行数，相当于使用多核机器加速训练过程
+
+sg：用于选择训练的模型，默认取值为“0”，即使用 CBOW 模型，取值为“1”时，使用 skip-gram 模型
+
+hs：取值为“1”时，在训练过程中采用 hierarchical softmax 训练模型；默认取值为“0”，即采用 negative sampling 训练模型
+
+negative：用于 negative sampling 的负例数目，默认取值为“5“
+
+cbow_mean：取值为“0”时，模型隐层为输入层的向量之和，取值为“1"时，模型隐层为输入层向量的均值。只有在使用 CBOW 算法时才需要设置。
+
+iter：遍历语料的次数，默认取值为“5”
+
+trim_rule：用于指定词汇修剪规则，即那些特定的词汇需要保留、删除或使用默认规则进行处理（删除出现频数小于 min_count 参数的词汇），取值为“None”时，表示使用默认规则（min_count）
+
+sorted_vocab：默认取值为“1”，表示在给词汇分配索引之前将词汇按照词频降序排列
+
+例 1 以 NLTK 提供的 brown 语料为例训练 word2vec 模型
+
+
+In [1]:import nltk
+       import gensim
+       from nltk.corpus import brown
+       sentences=[[j.lower() for j in i] for i in brown.sents()]
+       sentences
+Out[1]:[[u'the',u'fulton',u'county',……,u'took',u'place',u'.'],……]
+In [2]:model = gensim.models.Word2Vec(sentences, size=100, window=5, min_count=5)
+In [3]:set(model.vocab.keys()) # 查看模型中所有词汇
+Out[3]:{u'raining',u'writings',u'fig.',……,}
+In [4]:model['raining'] # 查看训练得到的词向量
+Out[4]:array([ 0.02810971,  0.05340325, -0.0142033 ,  0.02279282, -0.01404482,
+              -0.00586316, -0.02212046, -0.06923713, -0.01595714,  0.04950027,
+              ……
+              -0.0636242 , -0.03947466, -0.02702851, -0.06154357, -0.05934817,
+              -0.05101492,  0.01445699, -0.00774932,  0.02016927,  0.00441761], dtype=float32)
+5.3.3.1 doesnt_match 方法
+
+Word2Vec 类的 doesnt_match 方法可以识别给定词汇列表中存在差异的词汇，调用方式为：实例.doesnt_match(words)，参数 words 即为需要识别的词汇列表
+
+例 2
+
+
+In [5]:model.doesnt_match(['breakfast', 'cereal', 'dinner', 'lunch'])
+Out[5]:'cereal'
+5.3.3.2 most_similar 方法
+
+most_similar 方法用于识别与给定词汇最相似的词汇，调用方式为：实例.most_similar(positive=[], negative=[], topn=10, restrict_vocab=None)
+
+参数说明：
+
+positive：用于设置正向词汇列表，作为相似性的正向参照
+
+negative：用于设置负向词汇列表，作为相似性的负向参照
+
+topn：设置输出的词汇数量，当该参数取值被设置为“False”时，该方法直接返回所有词汇的相似性（夹角余弦值）构成的向量
+
+restrict_vocab：可选参数，用于控制检索词汇的范围，例如当该参数取值为 10000 时，只计算词汇列表中前 10000 个词汇的相似性，一般用于词汇列表按照词频降序排列的情况
+
+该方法的计算原理是：计算模型中每个词向量与给定词汇词向量简单平均的夹角余弦值，筛选出夹角余弦值最大的几个词汇。
+
+例 3
+
+
+In [6]:model.most_similar(positive=["wonderful","happy"],negative=["scared"],topn=5)
+Out[6]:[(u'fun', 0.8787847757339478),
+        (u'yours', 0.8648930788040161),
+        (u'collectors', 0.8642285466194153),
+        (u'none', 0.8616389036178589),
+        (u'expressed', 0.8604250550270081)]
+In [7]:model.most_similar(positive=["wonderful","happy"],negative=["scared"],topn=False)
+Out[7]:array([0.09320489,0.3076005,...,0.66536468,0.62079042], dtype=float32)
+5.3.3.3 n_similarity 方法
+
+n_similarity 方法用于计算两组词汇之间的相似性，即夹角余弦值，调用方式为：实例.n_similarity(ws1, ws2)，参数 ws1 和 ws2 为需要对比的两组词汇列表。
+
+例 4
+
+
+In [8]:model.n_similarity(['old', 'lady'], ['young', 'boy'])
+Out[8]:0.93014280423014239
+5.3.3.4 similar_by_word 方法
+
+similar_by_word 方法用于查找与指定词汇最相近的词，调用方式为：实例. similar_by_word(word, topn=10, restrict_vocab=None)，其中参数“word”即为指定的词汇，另外两个参数含义同方法“ most_similar”
+
+例 5
+
+
+In [9]:model.similar_by_word('nice',topn=5)
+Out[9]:[(u'pleasure', 0.9374653100967407),
+        (u'happy', 0.9323044419288635),
+        (u'funny', 0.9282171726226807),
+        (u'wonderful', 0.9254555702209473),
+        (u'lady', 0.9230206608772278)]
+In [10]:model.similar_by_word('nice',topn=False)
+Out[10]:array([ 0.17490953,  0.43710032,  0.26169139, ...,  0.69598532,
+        0.7782889 ,  0.7407155 ], dtype=float32)
+5.3.3.5 similarity 方法
+
+similarity 方法用于计算两个词向量之间的夹角余弦值，调用方式为：实例.similarity(w1, w2)，参数 w1、w2 即为需要计算的两个词汇
+
+例 6
+
+
+In [11]:model.similarity('pleasure', 'happy')
+Out[11]:0.90909800835209531
+In [12]:model.similarity('pleasure', 'pleasure')
+Out[12]:1.0
