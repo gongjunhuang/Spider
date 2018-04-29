@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>web 11</title>
+        <style>
+            /*
+            这是 css 的注释方法
+            这个是写在 style 标签里面的 css
+            */
+            .todo-cell {
+                background: green;
+            }
+            div {
+                /*background: black;*/
+            }
+            #id-todo-2 {
+                background: red;
+            }
+
+            /* postion 属性 */
+            .square {
+                position: relative;
+                top: -7px;
+                left: 0px;
+                color: black;
+                font-size: 15px;
+            }
+            #id-todo-2 {
+                position: absolute;
+                /* z-index: 10000; */
+                bottom: 10px;
+                /* 0 的时候可以省略单位 */
+                left: 0;
+            }
+            #id-fixed {
+                position: fixed;
+                bottom: 10px;
+            }
+            .gua-height {
+                height: 600px;
+                background: lightblue;
+            }
+            /* overflow */
+            /* border */
+            .gua-box {
+                width: 100px;
+                height: 50px;
+                background: lightyellow;
+                overflow: hidden;
+                /* border-width: 10px; */
+                /* border-style: solid; */
+                /* border-bottom-color: red; */
+                border: 10px solid blue;
+                border-bottom: 10px dashed red;
+            }
+            /* margin 和 padding 缩写 */
+            .gua-box {
+
+            }
+
+            /* float */
+            .gua-float {
+                background: lightcoral;
+            }
+            .gua-left {
+                float: left;
+            }
+            .gua-right {
+                float: right;
+            }
+            /* 清除浮动 */
+            .gua-float::after {
+                content: "";
+                display: block;
+                clear: both;
+            }
+
+            /* 伪类 和 伪元素 */
+            /* hover 表示鼠标划过的状态 */
+            .gua-float:hover {
+                background: green;
+            }
+
+            .star::after {
+                content: "★";
+                color: #ffa357;
+            }
+            .star1::after {
+                content: "☆";
+                color: #ffa357;
+            }
+        </style>
+        <!-- 引入外部的 css 文件 -->
+        <link rel="stylesheet" href="web11.css">
+    </head>
+    <body>
+        <!-- inline css -->
+        <div class="gua-main" style="background: red; color: white;">
+            吃瓜 E = MC<span class="square">2</span>是质能公式
+        </div>
+        <div class="todo-list">
+            <div class="todo-cell" style="background: yellow;">
+                吃饭
+            </div>
+            <div id="id-todo-2" class="todo-cell">
+                睡觉
+            </div>
+            <div id="id-fixed" class="todo-cell">
+                fixed 元素
+            </div>
+            <button>按钮</button>
+            <input type=text>
+        </div>
+        <div class="gua-box">
+            hello gua
+            hello gua
+            hello gua
+            hello gua
+            hello gua
+            hello gua
+            hello gua
+            hello gua
+            hello gua
+            hello gua
+            hello gua
+        </div>
+        <div class="gua-float">
+            <div class="gua-left">
+                left
+            </div>
+            <div class="gua-right">
+                right
+            </div>
+        </div>
+        <span class="star"></span>
+        <span class="star"></span>
+        <span class="star1"></span>
+        <span class="star1"></span>
+        <span class="star1"></span>
+        <div class="gua-height">
+            gk
+        </div>
+    </body>
+</html>
