@@ -1,0 +1,22 @@
+2018/04/30 14:31:45 请求方法 GET
+2018/04/30 14:31:45 request, query 参数 ImmutableMultiDict([])
+2018/04/30 14:31:54 message_add 请求方法 POST
+2018/04/30 14:31:54 request, POST 的 form 表单数据 ImmutableMultiDict([('msg_post', 'dsff')])
+2018/04/30 14:31:54 请求方法 GET
+2018/04/30 14:31:54 request, query 参数 ImmutableMultiDict([])
+2018/04/30 14:31:57 message_add 请求方法 POST
+2018/04/30 14:31:57 request, POST 的 form 表单数据 ImmutableMultiDict([('msg_post', 'fsdf')])
+2018/04/30 14:31:57 请求方法 GET
+2018/04/30 14:31:57 request, query 参数 ImmutableMultiDict([])
+2018/04/30 14:31:59 message_add 请求方法 POST
+2018/04/30 14:31:59 request, POST 的 form 表单数据 ImmutableMultiDict([('msg_post', '111')])
+2018/04/30 14:31:59 请求方法 GET
+2018/04/30 14:31:59 request, query 参数 ImmutableMultiDict([])
+2018/04/30 14:32:06 请求方法 GET
+2018/04/30 14:32:06 request, query 参数 ImmutableMultiDict([('msg', 'bdgd')])
+2018/04/30 14:32:53 message_add 请求方法 POST
+2018/04/30 14:32:53 request, POST 的 form 表单数据 ImmutableMultiDict([('msg_post', 'dfs')])
+2018/04/30 14:32:53 请求方法 GET
+2018/04/30 14:32:53 request, query 参数 ImmutableMultiDict([])
+2018/04/30 15:50:59 debug 0
+2018/04/30 15:51:08 debug 0
