@@ -6,9 +6,12 @@ from flask import (
     url_for,
     Blueprint,
     make_response,
+    send_from_directory,
 )
-
+from werkzeug.utils import secure_filename
 from models.user import User
+from config import user_file_director
+import os
 
 from utils import log
 
@@ -51,3 +54,7 @@ def profile():
         return redirect(url_for('.index'))
     else:
         return render_template('profile.html', user=u)
+
+@main.route('/uploads/<filename>')
+def uploads(filename):
+    return send_from_directory(user_file_director, filename)

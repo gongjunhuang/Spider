@@ -18,8 +18,14 @@ class Topic(Model):
         self.ct = int(time.time())
         self.ut = self.ct
         self.user_id = form.get('user_id', '')
+        self.board_id = int(form.get('board_id', -1))
 
     def replies(self):
         from .reply import Reply
         ms = Reply.find_all(topic_id=self.id)
         return ms
+
+    def board(self):
+        from .board import Board
+        m = Board.find(self.board_id)
+        return m
