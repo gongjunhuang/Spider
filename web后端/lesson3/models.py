@@ -51,6 +51,11 @@ class Model(object):
         ms = [cls.new(m) for m in models]
         return ms
 
+    @classmethod
+    def new(cls, form):
+        m = cls(form)
+        return m
+
     def save(self):
         """
         save 函数用于把一个 Model 的实例保存到文件中
@@ -91,6 +96,6 @@ class User(Model):
 
 # 定义一个 class 用于保存 message
 class Message(Model):
-    def new(self, form):
+    def __init__(self, form):
         self.author = form.get('author', '')
         self.message = form.get('message', '')
