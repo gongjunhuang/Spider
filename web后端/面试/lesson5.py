@@ -9,7 +9,7 @@ def redirect(url):
     }
     r = response_with_headers(headers, 302)
     return r.encode('utf-8')
-    
+
 
 一个简单 todo 程序项目, 包含的文件如下
     routes_todo.py 包含了项目的所有路由函数
@@ -31,6 +31,7 @@ Content-Type: application/x-www-form-urlencoded
 
 title=heuv
     2, 服务器解析出表单的数据, 并且增加一条新数据, 并返回 302 响应
+自动302，浏览器得到一个302的请求的时候，自动刷新页面
 HTTP/1.1 302 REDIRECT
 Location: /todo
 
@@ -88,3 +89,39 @@ Connection: keep-alive
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
 Cookie: user=gua1
 """
+
+self.created_time = form.get('created_time', -1)
+self.update_time = form.get('update_time', -1)
+if self.created_time is None:
+    self.created_time = int(time.time())
+    self.update_time = self.created_time
+
+
+补全edit、update
+
+def edit(request):
+    '''
+    /edit?id=1
+    '''
+    todo_id = int(request.query.get('id', -1))
+    todo = Todo.find_by(id=todo_id)
+    body = template('simple_todo.html', todo=todo)
+    return http_response(body)
+
+def update(request):
+    todo_id = int(request.query.get('id', -1))
+    todo = Todo.find_by(id=todo_id)
+    form = request.form()
+    t.task = form.get('task')
+    t.save()
+    return redirect('/')
+
+
+def __init__(self, form):
+        self.id = form.get('id', None)
+        self.username = form.get('username', '')
+        self.password = form.get('password', '')
+        self.role = int(form.get('role', 10))
+
+    def is_admin(self):
+        return self.role == 1
