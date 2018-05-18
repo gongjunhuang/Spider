@@ -1,0 +1,338 @@
+"""
+注意，需要安装 pymongo 这个库
+pip3 install pymongo
+
+
+在你安装并开启 mongo 之后，就可以使用 pymongo 来连接使用 mongodb 了
+"""
+
+import pymongo
+import random
+
+
+# 连接 mongo 数据库, 主机是本机, 端口是默认的端口
+client = pymongo.MongoClient("mongodb://localhost:27017")
+print('连接数据库成功', client)
+
+# 设置要使用的数据库
+mongodb_name = 'web8'
+# 直接这样就使用数据库了，相当于一个字典
+# 也可以这样用 db = client.web8
+db = client[mongodb_name]
+
+
+# 插入数据
+# ===
+# mongo 中的 document 相当于 sqlite 中的 table
+# 不需要定义，直接使用
+# 不限定每条数据的字段
+# 直接插入新数据，数据以字典的形式提供
+# 下面的例子中， user 是文档名（表名），不存在的文档会自动创建
+# 每个数据有一个自动创建的字段 _id，可以认为是 mongo 自动创建的主键
+
+def insert():
+    u = {
+        'aklsfj': False,
+        'askldfj': 'gua',
+        # 'note': '瓜',
+        # 放一个随机值来方便区分不同的数据以便下面的代码使用条件查询
+        # '随机值': random.randint(0, 3),
+    }
+    db.user.insert(u)
+    # 相当于 db['user'].insert
+
+insert()
+
+
+# 查找数据
+# ===
+# find 返回一个可迭代对象，使用 list 函数转为数组
+def find():
+    user_list = list(db.user.find())
+    print('所有用户', user_list)
+
+
+# find 可以传入参数来做条件查询
+# 具体可以很复杂 我们这里只演示简单的
+#
+# 查询随机值为 1 的所有数据
+def find1():
+    query = {
+        '随机值': 1,
+        'name': 'gua'
+    }
+    us = list(db.user.find(query))
+    print('random 1 ', len(us))
+    # for u in us:
+    #     print(u['name'])
+    #
+    # 查询 随机值 大于 1 的所有数据
+    query = {
+        '随机值': {
+            '$gt': 1
+        },
+    }
+    print('random > 1', list(db.user.find(query)))
+    #
+    # $or 查询
+    query = {
+        '$or': [
+            {
+                '随机值': 2,
+            },
+            {
+                'name': 'GUA'
+            }
+        ]
+    }
+    us = list(db.user.find(query))
+    print('or 查询', us)
+
+
+# find1()
+
+#
+# 此外还有 $lt $let $get $ne $or 等条件
+#
+#
+# 部分查询, 相当于 select xx, yy from 表名 语句
+#
+def find_cond():
+    query = {}
+    field = {
+        # 字段: 1 表示提取这个字段
+        # 不传的 默认是 0 表示不提取
+        # _id 默认是 1
+        'name': 1,
+        '_id': 0,
+    }
+    print('部分查询，只查询', list(db.user.find(query, field)))
+
+# find_cond()
+
+# 更新数据
+# ===
+# 默认更新第一条查询到的数据
+def update():
+    query = {
+        '随机值': 1,
+    }
+    form = {
+        '$set': {
+            'name': '更新 22222',
+        }
+    }
+    options = {
+        'multi': True,
+    }
+    # 注意, 上课这部分代码出问题了, 现在是修复过的
+    # 相当于 db.user.update(query, form, multi=True)
+    db.user.update(query, form, **options)
+
+
+update()
+
+# 如果想要更新所有查询到的数据
+# 需要加入下面的参数 {'multi': True}
+# db.user.update(query, form, {'multi': True})
+
+
+# 删除
+# ===
+# 删除和 find 是一样的
+# db.user.remove()
+
+# all 是给用户使用的查询函数
+def all():
+    query = {
+        '_deleted': False,
+    }
+    user_list = list(db.user.find(query))
+    us = []
+    for u in user_list:
+        u.pop('_deleted')
+        us.append(u)
+    print('所有用户', len(us), us)
+
+# all()
+
+
+
+
+
+
+# 常用的关系型数据库有 mysql postgresql sqlite 等（具体区别上课再说）
+#
+# 传统数据库以表的形式存储数据
+# 一张表可以有很多个字段
+
+# 以用户表为例, 存储 4 个数据的表结构如下
+# 用户 id
+# 用户名
+# 密码
+# 邮箱
+#
+# 范例数据如下
+# 1     gua     123     gua@qq.com
+# 2     gua1    23      gua1@q.com
+
+# 数据库通过 SQL 来操作数据
+# SQL （结构化查询语言）
+# 操作数据库的接口 也就是操作数据库的方法
+# 增加数据
+# 删除数据
+# 修改数据
+# 查询数据
+# CRUD
+# create retrieve update delete
+#
+# 数据库的更多的概念，上课会解释（文字太苍白）
+# 请下载 sqlitebrowser 软件（这是一个管理 sqlite 数据库的免费软件，自行搜索或者等群内链接）
+
+# SQL 语句如下（仅为范例，上课会讲具体的语法）
+"""
+INSERT INTO
+    `users`(`id`,`username`,`password`,`email`)
+VALUES \
+    (2,'','',NULL);
+
+UPDATE `users` SET `username`=? WHERE `_rowid_`='2';
+UPDATE `users` SET `password`=? WHERE `_rowid_`='2';
+UPDATE `users` SET `email`=? WHERE `_rowid_`='2';
+"""
+
+"""
+几种关系型数据库的用法和 sql 语法都极度相似
+开发中一般会用 sqlite 数据库
+部署到服务器上的时候才会使用 mysql 等数据库
+
+
+下面是 python 操作 sqlite 数据库的范例代码
+注意，代码上课会讲，你不用看懂，也不用运行
+"""
+
+import sqlite3
+
+
+def create(conn):
+    # 注意 CREATE TABLE 这种语句不分大小写
+    sql_create = '''
+    CREATE TABLE `users` (
+        `id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        `username`	TEXT NOT NULL UNIQUE,
+        `password`	TEXT NOT NULL,
+        `email`	TEXT
+    )
+    '''
+    # 用 execute 执行一条 sql 语句
+    conn.execute(sql_create)
+    print('创建成功')
+
+
+def insert(conn, username, password, email):
+    sql_insert = '''
+    INSERT INTO
+        users(username,password,email)
+    VALUES
+        (?, ?, ?);
+    '''
+    # 下面的写法用 string.format 拼 sql, 是一个严重的安全漏洞
+    # 会被 SQL 注入
+    # sql = '''
+    # INSERT INTO
+    #     users(username,password,email)
+    # VALUES
+    #     ("{}", "{}", "{}")
+    # '''.format('123', '345', 'a.com')
+    # conn.execute(sql)
+    # 参数拼接要用 ?，execute 中的参数传递必须是一个 tuple 类型
+    conn.execute(sql_insert, (username, password, email))
+    print('插入数据成功')
+
+
+def select(conn):
+    # 一个注入的用户名
+    usr = 'gua" or "1"="1'
+    pwd = 'gua'
+    sql = '''
+    SELECT
+        id, username, email
+    FROM
+        users
+    WHERE
+        username="{}" and password="{}"
+    '''.format(usr, pwd)
+    # 这是读取数据的套路
+    cursor = conn.execute(sql)
+    print('所有数据', list(cursor))
+    # for row in cursor:
+    #     print(row)
+
+
+def delete(conn, user_id):
+    sql_delete = '''
+    DELETE FROM
+        users
+    WHERE
+        id=?
+    '''
+    # 注意, execute 的第二个参数是一个 tuple
+    # tuple 只有一个元素的时候必须是这样的写法
+    conn.execute(sql_delete, (user_id,))
+
+
+def update(conn, user_id, email):
+    """
+    UPDATE
+        `users`
+    SET
+        `email`='gua', `username`='瓜'
+    WHERE
+        `id`=6
+    """
+    sql_update = '''
+    UPDATE
+        `users`
+    SET
+        `email`=?
+    WHERE
+        `id`=?
+    '''
+    conn.execute(sql_update, (email, user_id))
+
+
+def main():
+    # 指定数据库名字并打开
+    db_path = 'web8.sqlite'
+    conn = sqlite3.connect(db_path)
+    print("打开了数据库")
+    # 打开数据库后 就可以用 create 函数创建表
+    # create(conn)
+    # 然后可以用 insert 函数插入数据
+    # insert(conn, 'sql4', '1234', 'a@b.c')
+    # 可以用 delete 函数删除数据
+    # delete(conn, 1)
+    # 可以用 update 函数更新数据
+    # update(conn, 1, 'gua@cocode.cc')
+    # select 函数查询数据
+    # select(conn)
+    #
+    # 必须用 commit 函数提交你的修改
+    # 否则你的修改不会被写入数据库
+    conn.commit()
+    # 用完数据库要关闭
+    conn.close()
+
+
+if __name__ == '__main__':
+    main()
+
+
+'''
+CREATE TABLE `users` (
+    `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    `username` TEXT NOT NULL UNIQUE,
+    `password` TEXT NOT NULL,
+    `email` TEXT
+)
+'''
