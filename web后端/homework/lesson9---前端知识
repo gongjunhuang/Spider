@@ -15,6 +15,7 @@
             <button id="id-button-login">登录按钮</button>
         </div>
         <h1 id='id-msg'></h1>
+        <!--引入js代码的方式   1，引入js文件 -->
         <!-- <script src='web9.js'></script> -->
 <script>
     // 2017/03/05
