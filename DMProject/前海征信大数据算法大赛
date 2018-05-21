@@ -1,0 +1,274 @@
+前海征信“好信杯”大数据算法大赛
+
+1. 数据初探（必须）
+     1.1 导入包
+     1.2 读入数据
+     1.3 初步信息了解
+     1.4 统计信息
+
+2. 数据探索性分析+特征工程
+     2.1 int64型数据探索
+     2.2 缺失严重的特征处理
+     2.3 缺失值填充
+     2.4 高线性相关性的特征处理
+
+3. 单模型训练
+     3.1 模型训练
+     3.2 模型测试
+
+4. 提示
+
+```
+1. 数据初探
+1.1 和所有的做数据的分析一样，我们先导入最常用的包.
+In [1]:
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import xgboost as xgb
+import warnings
+warnings.filterwarnings('ignore')
+%matplotlib inline
+
+
+In [2]:
+ls ../input/qhzx/
+A_train.csv*  B_test.csv*  B_train.csv*  submit_sample.csv*
+1.2 读入数据
+In [3]:
+train_A = pd.read_csv('../input/qhzx/A_train.csv')
+train_B = pd.read_csv('../input/qhzx/B_train.csv')
+test_B = pd.read_csv('../input/qhzx/B_test.csv')
+1.3 初步信息了解
+因为我们仅仅只对数据集B进行处理,此处我们就先看一下数据集B的基本信息,经过初步的观察,我们发现数据集B含有下列信息:
+
+我们发现数据集B一共有491个特征,同时数据中还含有大量的缺失值
+数据的range很大,有5226.59的又有0的.
+PS:上述的结论可以直接从几个简单的样本中观察得到.
+
+In [4]:
+train_B.head()
+Out[4]:
+no	UserInfo_1	UserInfo_2	UserInfo_3	UserInfo_4	ProductInfo_1	UserInfo_5	UserInfo_6	ProductInfo_2	UserInfo_7	...	UserInfo_264	UserInfo_265	ProductInfo_214	UserInfo_266	UserInfo_267	ProductInfo_215	ProductInfo_216	UserInfo_268	UserInfo_269	UserInfo_270
+0	8192	NaN	5226.59	0.0	0.0	0.0	296.0	0.0	0.0	0.0	...	0.0	7.0	0.0	0.0	15.0	0.0	0.0	0.0	2940.0	NaN
+1	1	NaN	0.00	0.0	0.0	0.0	NaN	0.0	0.0	46000.0	...	0.0	3.0	0.0	0.0	NaN	0.0	NaN	0.0	0.0	NaN
+2	8195	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	...	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN
+3	8196	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	...	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN
+4	16387	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	...	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN
+5 rows × 491 columns
+
+1.4 统计信息1
+describe()是我们常用的用于从全局范围了解数据统计信息的一个函数,通过观察我们发现数据集的特征中存在下列信息:
+
+特征之间存在不同情况的缺失,例如：UserInfo_1中就只有一个数据,UserInfo_3中有1515个数据,缺失情况较为严重,UserInfo_12则不存在缺失情况. 而针对不同的缺失情况我们需要考虑删除特征或者样本删除的操作[1].
+特征没有全部进行归一化,例如UserInfo_270的最小值为7000,最大的是401000,ProductInfo_216最小值为0,最大值为1,不同特征的range大小不一样. 如果希望尝试使用非基于树的模型,就不得不考虑Normalization操作了[2].
+很多数据存在非常大的波动,例如UserInfo_3的std为11156.96,考虑是否需要进行特殊处理,本文暂不做处理[3].
+In [5]:
+pd.set_option('display.max_columns',200)
+train_B.describe()
+
+
+1.4 统计信息2
+我们再利用info查看另外一个统计信息,看这个统计信息主要是为了两件事：
+
+判断数据的类型: 我们发现数据主要由float64和int64两种数据,没有object数据,所以无需考虑针对object的数据的特殊处理,因为有int64的数据,所以很自然的我们会想到是不是cate型数据,是否需要进行编码操作等[4].
+数据集的大小: 数据的大小主要是帮助我们考虑自己的电脑是否可以处理,防止莫名其妙机器中途就挂掉[5].
+In [6]:
+train_B.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 4000 entries, 0 to 3999
+Columns: 491 entries, no to UserInfo_270
+dtypes: float64(488), int64(3)
+memory usage: 15.0 MB
+2. 数据探索性分析+特征工程
+上面的数据分析非常初步,主要是希望给与我们自己对于数据的一个大致印象,同时获取少许的预处理指导,包括是否需要考虑删除缺失严重的样本等等.这里我们先针对上述发现的一些特殊的情况,严重的缺失的情况,int64类型特征的处理等问题进行操作.然后再进行其他的探索分析.我们实际生活中或者比赛中往往会根据数据的分析来进行特征工程的构造,所以我们将数据分析和特征工程放在一起.
+
+2.1 int64型数据探索
+我们先看一下上述的3个int64型数据.看看有没有惊喜.因为no是我们用户的索引,flag是我们的label,一般不会存在问题,此处我们重点观察一下UserInfo_170型数据.
+
+In [7]:
+train_B.dtypes[train_B.dtypes == np.int64]
+Out[7]:
+no              int64
+flag            int64
+UserInfo_170    int64
+dtype: object
+我们发现UserInfo_170特征只有一个值0,而且是所有的数据都是0,这个特征对任何model都不会带来增益,所以毫无疑问地我们可以将其
+直接删除.
+In [8]:
+train_B['UserInfo_170'].unique()
+Out[8]:
+array([0])
+In [9]:
+train_B['UserInfo_170'].count()
+Out[9]:
+4000
+In [10]:
+train_B = train_B.drop('UserInfo_170',axis=1)
+2.2 严重缺失的特征处理
+严重缺失的特征会给模型带来极大的噪音,模型在学习的过程中会被较大程度的干扰,所以为了增加模型的鲁棒性,我们考虑将含有大的噪音
+的数据进行删除.此处我们设立阈值为1%,我们将缺失的特征大于99%的特征删除.(阈值可以自己进行调整).
+
+我们将数据的维度由490降维至431.既降低了内存消耗,同时后面会发现模型的性能大大提升.
+In [11]:
+train_B_info = train_B.describe()
+In [12]:
+train_B_info.head()
+
+In [13]:
+meaningful_col = []
+for col in train_B_info.columns:
+    if train_B_info.ix[0,col] > train_B.shape[0] * 0.01:
+           meaningful_col.append(col)
+In [14]:
+train_B_1 = train_B[meaningful_col].copy()
+In [15]:
+train_B.shape
+Out[15]:
+(4000, 490)
+In [16]:
+train_B_1.shape
+Out[16]:
+(4000, 431)
+2.3 缺失值填充
+关于缺失值的处理,不同的问题有不同的处理方式,有的时候我们需要对其进行删除,有时会进行填充(填充的方式也有不同,后续我们会选择特定的问题进行阐述),此处我们仅仅介绍和贷款类业务相关的处理:
+
+在贷款业务中,很多缺失值是有实际意义的,它们往往来源于用户故意不填写,或者没有,所以我们没法搜集这些数据,这个需要一些简单的业务理解.而针对这样的情况,一个非常有效的方式是直接填充某一个值(可以是-100,999等其他值)[6],此处我们直接用-999进行填充.
+In [17]:
+train_B_1 = train_B_1.fillna(-999)
+2.4 高线性相关性数据处理
+如果两个特征是完全线性相关的,这个时候我们仅仅只需要保留其中一个即可.因为第二个特征包含的信息基本完全被第一个特征所包含.此时如果两个特征同时保留的话,模型的性能很大情况下会出现下降的情况.
+
+我们选择将高线性相关的特征进行删除[7].
+In [18]:
+relation = train_B_1.corr()
+In [19]:
+length = relation.shape[0]
+high_corr = list()
+final_cols = []
+del_cols =[]
+for i in range(length):
+    if relation.columns[i] not in del_cols:
+        final_cols.append(relation.columns[i])
+        for j in range(i+1,length):
+            if (relation.iloc[i,j] > 0.98) and (relation.columns[j] not in del_cols):
+                del_cols.append(relation.columns[j])
+In [20]:
+train_B_1 = train_B_1[final_cols]
+
+3. 模型训练与测试
+3.1 模型训练
+好了,虽然上面的数据预处理和分析很简单,但是考虑到该赛题的数据是进行过预处理的,所以进行微处理后的数据已经具有较好的表示能力了,下面我们就上模型吧.
+
+这一题我们直接选用比赛常用的包XGBoost(https://github.com/dmlc/xgboost) [8].
+关于XGBoost的调参的相关技巧我们后续会在后续Tutorial中给出,为了能够复现成绩,注意在每个算法的包中都有一个随机种子,在XGBoost里面就是random_seed[9],此处我们选择随意一组参数(可以自己调整),注意不能过于依赖XGBoost了,不然会很吃亏的,如果有机会后续会介绍一些XGBoost并不适合的问题......
+
+
+
+
+
+In [22]:
+dtrain_B = xgb.DMatrix(data=train_B_1,label=train_B_flag)
+
+In [23]:
+
+Trate=0.25
+params = {'booster':'gbtree',
+                  'eta': 0.1,
+                   'max_depth': 4,
+                   'max_delta_step': 0,
+                   'subsample':0.9,
+                   'colsample_bytree': 0.9,
+                   'base_score': Trate,
+                   'objective': 'binary:logistic',
+                   'lambda':5,
+                   'alpha':8,
+                   'random_seed':100
+                   }
+params['eval_metric'] = 'auc'
+xgb_model = xgb.train(params,dtrain_B,num_boost_round=200,maximize=True,verbose_eval=True)
+
+
+3.2 模型测试
+模型训练完成之后我们进行预测并且对预测结果进行提交,注意这边我们
+
+选择采用test_B[train_B_1.columns]的形式[10]输入测试特征,这样做的好处是可以防止很多情况下我们不小心没有将特征进行对齐,
+例如训练集我们的特征的顺序为fea2,fea1,fea3.但是我们的测试集的特征顺序为fea1,fea2,fea3.这时我们的预测结果就会十分的糟糕.
+
+该参数下模型的结果为 0.602865,在之前比赛的线上可以到达top20的行列.
+
+In [24]:
+res = xgb_model.predict(xgb.DMatrix(test_B[train_B_1.columns].fillna(-999)))
+test_B['pred'] = res
+test_B[['no','pred']].to_csv('submit.csv',index = None)
+
+
+HTTP异常流量检测
+
+Birch算法：增量校验，速度很快
+DBSCAN算法效果最好
+
+```
+import pandas as pd
+beer = pd.read_csv('data.csv', sep=' ')
+X = beer[["calories", "sodium", "alcohol", "cost"]]
+
+from sklearn.cluster import KMeans
+km = KMeans(n_clusters=3).fit(X)
+km2 = KMeans(n_clusters=2).fit(X)
+
+beer['cluster'] = km.labels_
+beer['cluster2'] = km2.lables_
+beer.sort_values('cluster')
+
+
+from pandas.tools.plotting import scatter_matrix
+%matplotlib inline
+
+cluster_centers = km.cluster_centers_
+cluster_centers2 = km2.cluster_centers_
+
+
+centers = beer.groupby("cluster").mean().reset_index()
+
+%matplotlib inline
+import matplotlib.pyplot as plt
+plt.rcParams['font.size'] = 14
+
+import numpy as np
+colors = np.array(['red', 'green', 'blue', 'yellow'])
+plt.scatter(beer['calories'], beer['alcohol'], c=colors[beer['cluster']])
+
+plt.scatter(centers.calories, centers.alcohol, linewidths=3, marker='+', s=300, c='black')
+
+plt.xlabel("Calories")
+plt.ylabel("Alcohol")
+
+
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# 轮廓系数进行评估
+from sklearn import metrics
+score_scaled = metrics.silhouette_score(X, beer.scaled_cluster)
+score = metrics.silhouette_score(X, beer.cluster)
+
+
+scores = []
+for k in range(2, 20):
+    labels = KMeans(n_clusters=k).fit(X).labels_
+    score = metrics.silhouette_score(X, labels)
+    scores.append(score)
+
+
+
+#DBSCAN
+
+from sklearn.cluster import DBSCAN
+db = DBSCAN(eps=10, min_samples=2).fit(X)
+labels = db.labels_
+beer['cluster_db'] = labels
+beer.sort_values('cluster_db')
+```
