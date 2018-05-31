@@ -123,5 +123,40 @@ def __init__(self, form):
         self.password = form.get('password', '')
         self.role = int(form.get('role', 10))
 
-    def is_admin(self):
-        return self.role == 1
+def is_admin(self):
+    return self.role == 1
+
+
+def current_user(request):
+    session_id = request.cookies.get('user', '')
+    user_id = int(session.get(session_id), -1)
+    user = User.find_by(id=user_id)
+    return user
+
+def route_admin_users(request):
+    u = current_user()
+    if u.is_admin():
+        us = User.all()
+        body = template('admin_users.html')
+        return http_response(body)
+    else:
+        return redirect('/login')
+
+
+6.
+<form action='/admin/user/update' method='post'>
+    <input name='id'>
+    <input name='password'>
+    <button type='submit'>修改密码</button>
+    
+</form>
+
+def route_admin_user_update(request):
+    form = request.form()
+    user_id = int(form.get('id'), -1)
+    new_password = form.get('passsword', '')
+    u = User.find_by(id=user_id)
+    if u is not None:
+        u.password = new_password
+        u.save()
+    return redirect('/admin/users')
