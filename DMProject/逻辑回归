@@ -1,10 +1,136 @@
-目标：建立分类器，求解出theta
-设定阈值，根据阈值判断结果
+Logistic回归：最优化算法     Sigmoid函数
 
-要完成的模块：
-1.sigmoid函数
-2.model，返回预测结果值
-3.cost：计算函数损失
-4.gradient：计算每个参数的梯度方向
-5.descent：进行参数更新
-6.accuracy：计算精度
+最经典的二分类算法：先逻辑回归再用复杂的
+
+假设现在有一些数据点，用一条直线堆这些点进行拟合，这个拟合过程称为回归。
+
+主要思想：根据现有数据对分类边界线建立回归公式
+
+训练分类器：寻找最佳拟合参数，使用最优化算法
+
+过程：
+
+（1）收集数据：采用任意方法收集数据
+（2）准备数据：数值型，结构化数据格式最佳
+（3）分析数据
+（4）训练算法
+（5）测试算法
+（6）使用算法
+
+Sigmoid        1/(1 + e^(-x))
+
+实现Logistic回归分类器，在每个特征上都乘以一个回归系数，然后所有的结果值相加，将总和代入
+Sigmoid函数中，进而得到一个范围在0-1之间的数值。任意大于0.5的数据将被分入1类，小于0.5的
+归入0类。
+
+算法实现
+
+```
+from numpy import *
+import matplotlib.pyplot as plt
+
+def loadDataSet():
+    dataMat = []
+    labelMat = []
+    f = open('')
+    for line in f.readlines():
+        lineArr = line.strip().split()
+        dataMat.append([1.0, float(lineArr[0]), float(lineArr[1])])
+        labelMat.append(int(lineArr[2]))
+    return dataMat, labelMat
+
+def sigmoid(inX):
+    return 1.0/(1+exp(-inX))
+
+def gradAscent(dataMatIn, classLabels):
+    dataMatrix = mat(dataMatIn)
+    labelMat = mat(classLabels).transpose()
+    m, n = shape(dataMatrix)
+    alpha = 0.001
+    maxCycles = 500
+    weights = ones((n, 1))
+    for k in range(maxCycles):
+        h = sigmoid(dataMatrix * weights)
+        error = (labelMat - h)
+        weights = weights + alpha * dataMatrix.transpose()*error
+    return weights
+
+def plotBestFit(weights):
+    dataMat, labelMat = loadDataSet()
+    dataArr = array(dataMat)
+    n = shape(dataArr)[0]
+    xcord1 = []
+    ycord1 = []
+    xcord2 = []
+    ycord2 = []
+    for i in range(n):
+        if int(labelMat[i]) == 1:
+            xcord1.append(dataArr[i, 1])
+            ycord1.append(dataArr[i, 2])
+        else:
+            xcord2.append(dataArr[i, 1])
+            ycord2.append(dataArr[i, 2])
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.scatter(xcord1, ycord1, s=30, c='red', marker='s')
+    ax.scatter(xcord2, ycord2, s=30, c='green')
+    x = arange(-3.0, 3.0, 0.1)
+    y = (-weights[0] - weights[1] * x) / weights[2]
+    ax.plot(x, y)
+    plt.xlabel('X1')
+    plt.ylabel('X2')
+    plt.show()
+
+def stocGradAscent0(dataMat, classLabels):
+    m, n = shape(dataMat)
+    alpha = 0.01
+    weights = ones(n)
+    for i in range(m):
+        h = sigmoid(sum(dataMat[i]*weights))
+        error = classLabels[i] - h
+        weights = weights + alpha * error * dataMat[i]
+    return weights
+
+def stocGradAscent1(dataMat, classLabels, numIter=150):
+    m, n = shape(dataMat)
+    alpha = 0.01
+    weights = ones(n)
+    for j in range(numIter):
+        dataIndex = range(m)
+        for i in range(m):
+            alpha = 4 / (1.0+j+i) + 0.01
+            randIndex = int(random.uniform(0, len(dataIndex)))
+            h = sigmoid(sum(dataMat[randIndex] * weights))
+            error = classLabels[randIndex] - h
+            # 回归系数更新公式
+            weights = weights + alpha * error * dataMat[randIndex]
+            del(dataIndex[randIndex])
+    return weights
+```
+
+使用
+
+```
+import pandas as pd
+from sklearn.linear_model import LogisticRegression as LR
+from sklearn.linear_model import RandomizedLogisticRegression as RLR
+
+lessonPath = 'E:\\BaiduNetdiskDownload\\sourceCode\\week8\\lesson2.csv'
+luquPath = 'E:\\BaiduNetdiskDownload\\sourceCode\\week8\\luqu2.csv'
+
+dataLuqu = pd.read_csv(luquPath)
+# 特征
+x = dataLuqu.iloc[:, 1:4].as_matrix()
+y = dataLuqu.iloc[:, 0:1].as_matrix()
+
+r1 = RLR()
+r1.fit(x, y)
+# 特征筛选
+r1.get_support()
+t = dataLuqu.columns[r1.get_support()].as_matrix()
+
+r2 = LR()
+r2.fit(t, y)
+print('训练结束')
+print('模型正确率: '+ str(r2.score(x, y)))
+```
