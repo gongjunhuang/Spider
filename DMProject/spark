@@ -1,0 +1,8 @@
+from pyspark.mllib.fpm import FPGrowth
+
+data = sc.textFile("data")
+transactions = data.map(lambda line: line.strip().split(' '))
+model = FPGrowth.train(transactions, minSupport=0.2,  numPartitions=10)
+result = model.reqItemsets().collect()
+for fi in result:
+    print(fi)
