@@ -1,0 +1,37 @@
+分治法
+'''
+def MaxAddSub(a, start, end):
+	if(start == end):
+		return a[start];
+
+	middle = (start + end) / 2
+	m1 = MaxAddSub(a, start, middle)
+	m2 = MaxAddSub(a, middle+1, end)
+
+	left = now = a[middle]
+	for i in range(middle-1, start, -1):
+		now += a[i]
+		left = max(now, left)
+
+	right = a[middle + 1]
+	now = a[middle +1]
+	for i in range(middle+2, end, 1):
+		now += a[i]
+		right = max(now, right)
+	m3 = left + right
+
+	return max(m1, m2, m3)
+
+'''
+动态规划
+result = a[0]
+sum = a[0]
+for i in range(len(a)-1):
+	if sum > 0:
+		sum += a[i]
+	else:
+		sum = a[i]
+
+	if sum > result:
+		result = sum
+return result
