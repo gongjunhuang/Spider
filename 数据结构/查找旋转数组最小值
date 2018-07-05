@@ -1,0 +1,23 @@
+查找旋转数组最小值
+[0, 1, 2, 3, 4, 5, 6, 7]
+旋转之后
+[4, 5, 6, 7, 0, 1, 2]
+找出旋转之后的最小值
+
+'''
+def find_min(a):
+	low = 0
+	high = len(a) - 1
+	while low < high:
+		mid = (low + high) / 2
+		if (a[mid] < a[high]):
+			high = mid
+		else if(num[mid] > num[high]):
+			low = mid + 1
+
+	return a[low]
+'''
+
+
+
+最长公共子序列LCS    longest common subsequence
