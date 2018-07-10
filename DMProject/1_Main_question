@@ -1,0 +1,3 @@
+1. unicode error    cannot decode ...
+
+pd.read_csv('Train.csv', encoding='ISO-8859-1')

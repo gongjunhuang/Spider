@@ -1,0 +1,12 @@
+import random
+random.seed()
+def roulette(datalist):
+	i = 0
+	soFar = datalist[0][1]
+	ball = random.random()
+	while soFar < ball:
+		i += 1
+		soFar += datalist[i][1]
+	return datalist[i][0]
+
+	
