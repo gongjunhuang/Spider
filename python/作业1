@@ -1,0 +1,47 @@
+变量
+变量的命名和使用
+1.变量名只能包含字母、数字和下划线
+2.变量名不能包含空格，但是能用下划线来分隔其中的单词
+3.不要将python关键字和函数名作变量名
+
+字符串
+title()首字母大写
+lower()全部小写
+upper()全部大写
+strip()删除字符串两边的空白
+
+
+数字
+int 整数   python3中整数除法为精确除法，3/2 = 1.5
+float 浮点数
+str 字符串
+bool  boolean类型
+
+
+
+列表
+1. 修改、删除和添加元素
+append() 添加元素
+insert() 插入元素
+del 删除元素
+pop() 删除并返回元素
+
+2. 常用方法
+sort() 对列表进行永久性排序
+a.sort(reverse=True)
+
+sorted() 临时排序
+sorted(a)
+
+reverse() 反转列表
+len() 列表长度
+
+
+
+循环
+for item in list:
+    print(item)
+
+for value in range(n):
+    print(value)
+
