@@ -19,6 +19,7 @@ bool  boolean类型
 
 
 
+
 列表
 1. 修改、删除和添加元素
 append() 添加元素
@@ -45,3 +46,6 @@ for item in list:
 for value in range(n):
     print(value)
 
+while是Python的循环执行语句，在某条件下，一直执行语句，直到条件为False。
+
+while循环两个关键字：break是终止整个循环，continue是跳过本次循环。
