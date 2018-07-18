@@ -16,8 +16,8 @@ opener = urllib.request.build_opener(proxy_support)
 urllib.request.install_opener(opener)
 
 print("download and unzip files")
-dates = pd.date_range(pd.to_datetime('2001-01-01'), pd.to_datetime('2018-06-30'), freq='M')
+dates = pd.date_range(pd.to_datetime('2001-05-01'), pd.to_datetime('2018-06-30'), freq='M')
 
 for date in dates:
     url = 'http://mis.nyiso.com/public/csv/pal/{0}{1}01pal_csv.zip'.format(date.year, str(date.month).zfill(2))
-    urllib.request.urlretrieve(url, '../data/nyiso/{0}'.format(url.split('/')[-1]))
+    urllib.request.urlretrieve(url, 'C:/Users/JOE/DM/energy_forecasting_notebooks/data/nyiso/{0}'.format(url.split('/')[-1]))
