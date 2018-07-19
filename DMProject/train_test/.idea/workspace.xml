@@ -11,7 +11,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="download.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="download.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/download.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="241">
@@ -19,6 +19,15 @@
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="dump_info.py" pinned="false" current-in-tab="true">
+        <entry file="file://H:/数据挖掘/17年7月14日机器学习项目班（完）/讲义代码/第01-02课/lesson_1/dump_info.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="19">
+              <caret line="1" column="14" selection-start-line="1" selection-start-column="7" selection-end-line="1" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -124,10 +133,10 @@
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24963397" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Event Log" sideWeight="0.1830161" side_tool="true" visible="true" weight="0.35023043" />
+      <window_info anchor="bottom" id="Event Log" sideWeight="0.1830161" side_tool="true" visible="true" weight="0.17511521" />
       <window_info anchor="bottom" id="Version Control" show_stripe_button="false" />
       <window_info anchor="bottom" id="Python Console" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.8169839" visible="true" weight="0.35023043" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.8169839" visible="true" weight="0.17511521" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" />
       <window_info id="Favorites" side_tool="true" />
@@ -152,6 +161,13 @@
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://H:/数据挖掘/17年7月14日机器学习项目班（完）/讲义代码/第01-02课/lesson_1/dump_info.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="19">
+          <caret line="1" column="14" selection-start-line="1" selection-start-column="7" selection-end-line="1" selection-end-column="14" />
         </state>
       </provider>
     </entry>
