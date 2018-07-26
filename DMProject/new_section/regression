@@ -1,0 +1,63 @@
+'''
+def calcCoeffcient(data, listA, listW, listLostFunction):
+    N = len(data[0])
+    w = [0 for i in range(N)]
+    wNew = [0 for i in range(N)]
+    g = [0 for i in range(N)]
+
+    times = 0
+    alpha = 100.0
+    while times < 10000:
+    	j = 0
+    	while j < N:
+    		g[j] = gradient(data, w, j)
+    		j += 1
+    	normalize(g)
+    	alpha = calcAlpha(w, g, alpha, data)
+    	numberProduct(alpha, g, wNew)
+
+    	if isSame(w, wNew):
+    		break
+    	assign(w, wNew)
+    	times += 1
+    	listA.append(alpha)
+    	listW.append(assign(w))
+    	listLostFunction.append(fw(w, data))
+
+'''
+
+'''
+def calcAlpha(w, g, a, data):
+	c1 = 0.3
+	now = fw(w, data)
+	wNext = assign(w)
+	numberProduct(a, g, wNext)
+	next = fw(wNext, data)
+
+	count = 30
+	while next < now:
+		a *= 2
+		wNext = assign(w)
+		numberProduct(a, g, wNext)
+		nest = fw(wNext, data)
+
+		count -= 1
+		if count == 0:
+			break
+	return a
+
+'''
+
+'''
+def regression(data, alpha, lambda):
+	n = len(data[0]) - 1
+	theta = np.zeros(n)
+	for times in range(100):
+		for d in data:
+			x = d[:-1]
+			y = d[-1]
+			g = np.dot(theta, x) - y
+			theta = theta - alpha * g * x + lambda * theta
+		print(times, theta)
+	return theta
+'''

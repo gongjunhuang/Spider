@@ -1,0 +1,110 @@
+黑盒测试把程序看作一个不能打开的黑盒子，在完全不考虑程序内部结构和内部特性的情况下，针对“软件界面”和”软件功能“进行测试，只检查功能是否符合需求规格说明书能正常使用。因此黑盒测试又叫功能测试或数据驱动测试。
+
+白盒测试是对软件的过程性细节做细致的检查。这种方法是把测试对象看作一个打开的盒子，他允许测试人员利用程序内部的逻辑结构及有关信息，设计或选择测试用例，对程序所有逻辑路径进行测试。通过在不同点检查程序状态，确定实际状态是否与预期的状态一致。因此白盒测试又称为”结构测试“或”逻辑驱动测试“。白盒测试是按照程序内部的结构来测试程序，通过测试检验产品内部动作是否按照设计规格说明书的要求正常进行，检验程序中的每条通道是否都按照规定正常工作。
+
+ 黑盒测试主要是为了发现以下错误：
+
+ （1）是否有不正确或者遗漏了的功能；
+
+ （2）在接口上，输入能否正确的接受？能否输出正确的结果？
+
+ （3）是否有数据结构错误或外部信息（例如数据库文件）访问错误？
+
+ （4）性能上是否能够满足要求？
+
+ （5）是否有初始化或终止性错误？
+
+黑盒的测试用例技术设计有三种：  边界值分析、等价类划分、错误推测法。
+
+ 白盒测试主要是想对程序模块进行以下检查：
+
+ （1）对程序模块的所有独立的执行路径至少测试一遍；
+
+ （2）对所有的逻辑判定，取”真“与”假“的两种情况都能至少测一遍；
+
+ （3）在循环的边界和运行的界限内执行循环体；
+
+ （4）测试内部数据结构的有效性，等等；
+
+ （5）静态白盒测试  ：即代码审查，正式审查和检验设计和程序代码；
+
+ （6）动态白盒测试 利用查看代码功能和实现方式得到的信息来设计和执行测试，也叫结构测试；
+
+ 白盒的测试用例技术包括逻辑覆盖和基本路径测试。
+
+  逻辑覆盖：是以程序内在逻辑结构为基础的测试用例设计技术，这一方法要求测试人员对程序的逻辑结构有清楚的了解。
+
+ 基本路径测试：在程序控制流程图的基础上，通过分析控制构造的环路复杂性，导出基本可执行路径集合，从而设计测试用例。
+
+
+
+ 断言
+凡是用print()来辅助查看的地方，都可以用断言（assert）来替代：
+
+def foo(s):
+    n = int(s)
+    assert n != 0, 'n is zero!'
+    return 10 / n
+
+def main():
+    foo('0')
+
+assert的意思是，表达式n != 0应该是True，否则，根据程序运行的逻辑，后面的代码肯定会出错。
+
+如果断言失败，assert语句本身就会抛出AssertionError
+
+
+
+
+
+
+def laceStrings(s1, s2):
+    """
+    s1 and s2 are strings.
+
+    Returns a new str with elements of s1 and s2 interlaced,
+    beginning with s1. If strings are not of same length,
+    then the extra elements should appear at the end.
+    """
+    # Your Code Here
+    len1 = len(s1)
+    len2 = len(s2)
+    minLen = min(len1, len2)
+    result = []
+    for i in range(minLen):
+        result.append(s1[i])
+        result.append(s2[i])
+    if len1 > len2:
+        left = s1[minLen:]
+    elif len1 < len2:
+        left = s2[minLen:]
+    else:
+        left = []
+
+    result += left
+    result = ''.join(result)
+    print(result)
+    return str(result)
+
+
+
+    麦乐鸡块
+
+    def mcnuggets(n):
+    """ Determine if it's possible to buy exactly n McNuggets with packages
+        of 6, 9 and 20 McNuggets.
+
+        The solution is a Diophantine equation with 3 variables (ax+by+cz=n).
+        Calculate z=(n-ax-by)/c for all x,y. The time complexity is O(n^2).
+    """
+    packs = {'6': 0, '9': 0, '20': 0}
+    r1 = n // 6 + 1
+    r2 = n // 9 + 1
+    for x in range(r1):
+        for y in range(r2):
+            z, remainder = divmod(n - 6 * x - 9 * y, 20)
+            if remainder > 0 or z < 0:
+                continue
+            else:
+                return True
+    return False
