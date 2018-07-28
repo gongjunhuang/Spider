@@ -1,0 +1,9 @@
+# 信息熵的结果
+
+import matplotlib.pyplot as plt
+
+eps = 0.00001
+p = np.linspace(eps, 1-eps, 100)
+H = -p * np.log(p) - (1-p) * np.log(1-p)
+plt.plot(p, H)
+plt.show()
