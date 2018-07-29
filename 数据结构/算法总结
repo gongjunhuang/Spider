@@ -1,0 +1,154 @@
+时间复杂度
+算法的时间复杂度是一个函数，它定量描述了该算法的运行时间，时间复杂度常用“O”表述，使用这种方式时，时间复杂度可被称为是渐近的，它考察当输入值大小趋近无穷时的情况
+
+时间复杂度是用来估计算法运行时间的一个式子（单位），一般来说，时间复杂度高的算法比复杂度低的算法慢
+
+常见的时间复杂度高低排序：O(1)<O(logn)<O(n)<O(nlogn)<O(n2)<O(n2logn)<O(n3)
+
+
+
+空间复杂度
+空间复杂度：用来评估算法内存占用大小的一个式子
+定义一个或多个变量，空间复杂度都是为1，列表的空间复杂度为列表的长度
+
+
+二分查找
+def binary_search(find, list1) :
+  low = 0
+  high = len(list1)
+  while low <= high :
+    mid = (low + high) / 2
+    if list1[mid] == find :
+      return mid
+    #左半边
+    elif list1[mid] > find :
+      high = mid -1
+    #右半边
+    else :
+      low = mid + 1
+  #未找到返回-1
+  return -1
+
+
+冒泡排序
+
+冒泡排序原理即：从数组下标为0的位置开始，比较下标位置为0和1的数据，如果0号位置的大，则交换位置，如果1号位置大，则什么也不做，然后右移一个位置，比较1号和2号的数据，和刚才的一样，如果1号的大，则交换位置，以此类推直至最后一个位置结束，到此数组中最大的元素就被排到了最后，之后再根据之前的步骤开始排前面的数据，直至全部数据都排序完成。
+
+def bubbleSort(relist):
+	len_ = len(relist)
+	for i in range(len_):
+		for j in range(0,len_-i-1):
+			if relist[j] > relist[j+1]:
+				relist[j+1], relist[j] = relist[j], relist[j+1]
+	return relist
+
+
+选择排序
+
+第1趟，在待排序记录r1 ~ r[n]中选出最小的记录，将它与r1交换；
+第2趟，在待排序记录r2 ~ r[n]中选出最小的记录，将它与r2交换；
+以此类推，第i趟在待排序记录r[i] ~ r[n]中选出最小的记录，将它与r[i]交换，使有序序列不断增长直到全部排序完毕。
+
+def selectSort(relist):
+	len_ = len(relist)
+	for i in range(len_):
+	min_index = i
+		for j in range(i+1,len_): 
+		# 这个循环会找到值比第i个索引所代表值小的索引
+			if relist[j] < relist[min_index]:
+				min_index = j
+				relist[i] ,relist[min_index] = relist[min_index], relist[i] 
+				# 互换两个索引位置
+	return relist
+
+
+
+快速排序
+
+先从数列中取出一个数作为基准数。
+分区过程，将比这个数大的数全放到它的右边，小于或等于它的数全放到它的左边。
+再对左右区间重复第二步，直到各区间只有一个数。
+
+def quickSort(array):
+	if len(array) < 2:
+		return array
+	else:
+		pivot = array[0]
+		less = [i for i in array[1:] if i < pivot]
+		greater = [j for j in array[1:] if j > pivot]
+		return quickSort(less) + [pivot] + quickSort(greater)
+
+
+
+插入排序
+
+默认序列中的第0个元素是有序的（因为只有一个元素a[0]嘛，自然是有序的）；
+从下标为1（下标0没啥好插的）的元素开始，取当前下标i位置处的元素a[i]保存到一个临时变量waitInsert里；
+waitInsert与对前半部分有序序列的循环遍历比较，直到遇到第一个比waitInsert大的元素（这里默认是从小到大排序），此时的下标为j，然后将其插入到j的位置即可；
+因为前面的插入，导致后面元素向后推移一个位置，没关系，把原来下标i的元素弹出即可；
+重复进行第2步到第4步，直到乱序序列中的元素被全部插入到有序序列中；
+
+def insertSort(relist):
+	len_ = len(relist)
+	for i in range(1,len_):
+		for j in range(i):
+		if relist[i] < relist[j]:
+			relist.insert(j,relist[i]) # 首先碰到第一个比自己大的数字，赶紧刹车，停在那，所以选择insert
+			relist.pop(i+1) # 因为前面的insert操作，所以后面位数+1，这个位置的数已经insert到前面去了，所以pop弹出
+			break
+	return relist
+
+
+希尔排序
+
+在第一趟排序中，我们不妨设 gap1 = N / 2 = 5，即相隔距离为 5 的元素组成一组，可以分为 5 组。
+接下来，按照直接插入排序的方法对每个组进行排序。
+
+在第二趟排序中，我们把上次的 gap 缩小一半，即 gap2 = gap1 / 2 = 2 (取整数)。这样每相隔距离为 2 的元素组成一组，可以分为 2 组。
+按照直接插入排序的方法对每个组进行排序。
+
+在第三趟排序中，再次把 gap 缩小一半，即gap3 = gap2 / 2 = 1。 这样相隔距离为 1 的元素组成一组，即只有一组。
+按照直接插入排序的方法对每个组进行排序。此时，排序已经结束。
+需要注意一下的是，图中有两个相等数值的元素 5 和 5 。我们可以清楚的看到，在排序过程中，两个元素位置交换了。
+所以，希尔排序是不稳定的算法。
+
+def shell_sort(relist):
+	n = len(relist)
+	gap = n/2 # 初始步长
+	while gap > 0:
+		for i in range(gap, n):
+			temp = relist[i] # 每个步长进行插入排序
+			j = i
+			# 插入排序
+			while j >= gap and relist[j - gap] > temp:
+				relist[j] = relist[j - gap]
+				j -= gap
+			relist[j] = temp
+
+		gap = gap/2 # 得到新的步长
+
+	return relist
+
+
+归并排序
+
+使用分割的办法将这个序列分割成一个个已经排好序的子序列。然后再利用归并的方法将一个个的子序列合并成排序好的序列
+
+def merge(left,right):
+	result = []
+	while left and right:
+		result.append(left.pop(0) if left[0] <= right[0] else right.pop(0))
+	while left:
+		result.append(left.pop(0))
+	while right:
+		result.append(right.pop(0))
+
+	return result
+
+def mergeSort(relist):
+	if len(relist) <= 1:
+		return relist
+	mid_index = len(relist)/2
+	left = mergeSort(relist[:mid_index]) # 递归拆解的过程
+	right = mergeSort(relist[mid_index:])
+	return merge(left,right) # 合并的过程
