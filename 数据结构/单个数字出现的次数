@@ -1,0 +1,24 @@
+Given an array of integers, every element appears three times except for one. Find that single one.
+
+Note: 
+Your algorithm should have a linear runtime complexity. Could you implement it without using extra memory?
+
+
+
+
+import java.util.*;
+public class Solution {
+
+
+    public int singleNumber(int[] A) {     
+        int result=0;
+        for(int i=0;i<32;++i){
+            int bits=0;
+            for(int j=0;j<A.length;++j){
+                bits+=(A[j]>>i)&1;//依次获取元素的每一位，并将数组元素相同位相加              
+            }
+            result|=(bits%3)<<i;
+        }
+        return result;
+    }
+}
