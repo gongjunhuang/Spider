@@ -1,0 +1,107 @@
+'''
+from __future__  import print_function
+import math
+import random
+N = 100 # 迭代次数
+step = 0.5 # 初始步长
+epsilon = 0.00001
+variables = 2 # 变量数目
+x = [49,49] # 初始点坐标
+walk_num = 1 # 初始化随机游走次数
+print("迭代次数:",N)
+print("初始步长:",step)
+print("epsilon:",epsilon)
+print("变量数目:",variables)
+print("初始点坐标:",x)
+# 定义目标函数
+def function(x):
+    r = math.sqrt((x[0]-50)**2 + (x[1]-50)**2) + math.e
+    f = math.sin(r)/r + 1
+    return -f
+# 开始随机游走
+while(step > epsilon):
+    k = 1 # 初始化计数器
+    while(k < N):
+        u = [random.uniform(-1,1) for i in range(variables)] # 随机向量
+        # u1 为标准化之后的随机向量
+        u1 = [u[i]/math.sqrt(sum([u[i]**2 for i in range(variables)])) for i in range(variables)]
+        x1 = [x[i] + step*u1[i] for i in range(variables)]
+        if(function(x1) < function(x)): # 如果找到了更优点
+            k = 1
+            x = x1
+        else:
+            k += 1
+    step = step/2
+    print("第%d次随机游走完成。" % walk_num)
+    walk_num += 1
+print("随机游走次数:",walk_num-1)
+print("最终最优点:",x)
+print("最终最优值:",function(x))
+
+
+'''
+
+
+基本的随机游走算法对于初始点比较敏感，可以看出，当初始点位于最优点附件时，可以很好地达到全局最优点.当增大迭代次数以及初始步长之后，函数最终达到了全局最优点。但是迭代次数增加的代价则是运行时间的增加。总得来说，基本的随机游走算法可以很好地达到全局最优点，但是有时会依赖于初始点的选择。无论是随机游走算法还是改进的随机游走算法，对于步长都是非常依赖的。步长λ越大，意味着初始可以寻找最优解的空间越大，但同时也意味着更多的迭代次数要搜索空间变大，寻找次数变多，相应时间自然要增加)。如果步长取得过小，即使N很大，也很难达到最优解。无论对于随机游走算法还是改进的随机游走算法皆是如此。所以理论上步长λ越大越好。但是步长越大，迭代总次数越高，算法运行时间越长。所以实践中可以多试验几次，将λ取得适当地大即可。
+
+
+在python中，可以利用数组操作来模拟随机游走
+
+'''
+# 随机游走
+import matplotlib.pyplot as plt
+import random
+
+position = 0
+walk = [position]
+steps = 200
+for i in range(steps):
+    step = 1 if random.randint(0, 1) else -1
+    position += step
+    walk.append(position)
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.plot(walk)
+plt.show()
+
+'''
+
+第二种方式：简单的把随机步长累积起来并且可以可以使用一个数组表达式来计算。因此，用 np.random 模块去200次硬币翻转，设置它们为1和-1，并计算累计和：
+
+'''
+# 随机游走
+import matplotlib.pyplot as plt
+import numpy as np
+
+nsteps = 200
+draws = np.random.randint(0, 2, size=nsteps)
+steps = np.where(draws > 0, 1, -1)
+walk = steps.cumsum()
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.plot(walk)
+plt.show()
+'''
+
+一次模拟多个随机游走
+
+'''
+# 随机游走
+import matplotlib.pyplot as plt
+import numpy as np
+
+nwalks = 5
+nsteps = 200
+draws = np.random.randint(0, 2, size=(nwalks, nsteps)) # 0 or 1
+steps = np.where(draws > 0, 1, -1)
+walks = steps.cumsum(1)
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+for i in range(nwalks):
+    ax.plot(walks[i])
+
+plt.show()
+'''
