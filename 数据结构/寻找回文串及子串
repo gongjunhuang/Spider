@@ -1,0 +1,56 @@
+import java.util.*;
+public class Solution {
+ 
+    ArrayList<ArrayList<String>> resultList;
+    ArrayList<String> current;
+ 
+    public ArrayList<ArrayList<String>> partition(String s) {
+        resultList = new ArrayList<ArrayList<String>>();
+        current = new ArrayList<String>();
+        findPalindrome(s, 0);
+        return resultList;
+    }
+ 
+    /**
+     * 主要思路是回溯
+     * @param str
+     * @param left
+     */
+    private void findPalindrome(String str, int left) {
+        //回溯返回条件，left指针已到最后，也就是回溯到底了
+        if (current.size() > 0 && left >= str.length()) {
+            ArrayList<String> tempList = (ArrayList<String>) current.clone();
+            resultList.add(tempList);
+        }
+        for (int right = left; right < str.length(); right++) {
+            //不是回文的话，直接right++；
+            if (isPalindrome(str, left, right)) {
+                //添加回文
+                if (left == right) {
+                    current.add(Character.toString(str.charAt(left)));
+                }else{
+                    current.add(str.substring(left, right +1));
+                }
+                //进行回溯
+                findPalindrome(str, right + 1);
+                //移除刚刚添加的元素，也就是回到之前的状态，以便走其他分支
+                current.remove(current.size() - 1);
+            }
+        }
+ 
+    }
+ 
+    public boolean isPalindrome(String str, int left, int right) {
+        if (left == right) {
+            return true;
+        }
+        while (left < right) {
+            if (str.charAt(left) != str.charAt(right)) {
+                return false;
+            }
+            left++;
+            right--;
+        }
+        return true;
+    }
+}

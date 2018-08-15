@@ -38,3 +38,44 @@
 * 比如只要判断这个字符串是回文串，就可以直接返回0，不需要一步步计算其中的子序列
 */
 
+public class Solution {
+    private String s;
+    private int f[][] = new int[1000][1000];
+     
+    public boolean isPalindrome(int i, int j){
+        while(i < j){
+            if(s.charAt(i) != s.charAt(j)){
+                return false;
+            }
+            i++;
+            j--;
+        }
+        return true;
+    }
+    
+        
+    public int computeCut(int i, int j){
+        if(isPalindrome(i, j))
+            return 0;
+        int min = s.length();
+        for(int p = i; p<j; p++){
+            int a = f[i][p];
+            int b = f[p+1][j];
+            a = a+b+1;
+            min = min < a? min: a;
+        }
+        return min;
+    }
+    
+    public int minCut(String s) {
+        int minCut = 0;
+        
+        this.s = s;
+        for(int t = 0; t<s.length(); t++) {
+            for(int i=0, j=t; j <s.length(); j++, i++) {
+                f[i][j] = computeCut(i, j);
+            }
+        }
+        return f[0][s.length() - 1];
+    } 
+}
