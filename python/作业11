@@ -1,0 +1,277 @@
+def probTest(limit):
+    rolls = 1
+    n = 1.0/6
+    while n > limit:
+        n *= 5.0/6
+        rolls += 1
+    return rolls
+
+print probTest(5/36.0)
+
+
+
+曲线拟合
+
+# -*- coding: cp936 -*-
+import math
+import random
+import matplotlib.pyplot as plt
+import numpy as np
+ 
+ 
+'''
+在x=[0,1]上均匀采样10个点组成一个数据集D=[a,b]
+'''
+a = []
+b = []
+x=0
+def func(x):
+    mu=0
+    sigma=0.1
+    epsilon = random.gauss(mu,sigma) #高斯分布随机数
+    return np.sin(2*np.pi*x)+epsilon
+for i in range(0,10):
+    x=x+1.0/11.0
+    a.append(x)
+    b.append(func(x))
+ 
+ 
+ 
+ 
+#定义输出矩阵函数
+def print_matrix( info, m ): 
+    i = 0; j = 0; l = len(m)
+    print info
+    for i in range( 0, len( m ) ):
+        for j in range( 0, len( m[i] ) ):
+            if( j == l ):
+                print ' |',
+            print '%6.4f' % m[i][j],
+        print
+    print
+ 
+ 
+#定义交换变量函数
+def swap( a, b ):
+    t = a; a = b; b = t
+    
+#定义线性方程函数，高斯消元法    
+def solve( ma, b, n ):
+    global m; m = ma # 这里主要是方便最后矩阵的显示
+    global s;    
+    i = 0; j = 0; row_pos = 0; col_pos = 0; ik = 0; jk = 0
+    mik = 0.0; temp = 0.0  
+    n = len( m )
+# row_pos 变量标记行循环, col_pos 变量标记列循环
+    while( ( row_pos < n ) and( col_pos < n ) ):
+        # 选主元
+        mik = - 1
+        for i in range( row_pos, n ):
+            if( abs( m[i][col_pos] ) > mik ):
+                mik = abs( m[i][col_pos] )
+                ik = i
+        if( mik == 0.0 ):
+            col_pos = col_pos + 1
+            continue
+        # 交换两行
+        if( ik != row_pos ):
+            for j in range( col_pos, n ):
+                swap( m[row_pos][j], m[ik][j] )
+                swap( m[row_pos][n], m[ik][n] );  
+        try:
+            # 消元
+            m[row_pos][n] /= m[row_pos][col_pos]
+        except ZeroDivisionError:
+            # 除零异常 一般在无解或无穷多解的情况下出现……
+            return 0;     
+        j = n - 1
+        while( j >= col_pos ):
+            m[row_pos][j] /= m[row_pos][col_pos]
+            j = j - 1
+        for i in range( 0, n ):
+            if( i == row_pos ):
+                continue
+            m[i][n] -= m[row_pos][n] * m[i][col_pos]
+            j = n - 1
+            while( j >= col_pos ):
+                m[i][j] -= m[row_pos][j] * m[i][col_pos]
+                j = j - 1
+        row_pos = row_pos + 1; col_pos = col_pos + 1
+    for i in range( row_pos, n ):
+        if( abs( m[i][n] ) == 0.0 ):
+            return 0
+    return 1
+ 
+ 
+ 
+ 
+matrix_A=[]         #将系数矩阵A的所有元素存到a[n-1][n-1]中
+matrix_b=[]
+X=a
+Y=b
+N=len(X)
+M=3    #对于题目中要求的不同M[0,1,3,9]值，需要在这里更改，然后重新编译运行
+ 
+ 
+#计算线性方程组矩阵A的第[i][j]个元素A[i][j]    
+def matrix_element_A(x,i,j,n): 
+    sum_a=0
+    for k in range(0,n):   
+        sum_a = sum_a+pow(x[k],i+j-2)   #x[0]到x[n-1]，共n个元素求和
+    return sum_a
+ 
+ 
+for i in range(0,M+1):  
+    matrix_A.append([])  
+    for j in range(0,M+1):  
+        matrix_A[i].append(0)
+        matrix_A[i][j] = matrix_element_A(X,i+1,j+1,N)
+#计算线性方程组矩阵b的第[i]行元素b[i]
+def matrix_element_b(x,y,i,n): 
+    sum_b=0
+    for k in range(0,n):
+        sum_b=sum_b+y[k]*pow(x[k],i-1)  #x[0]到x[n-1]，共n个元素求和
+    return sum_b
+for i in range(0,M+1):
+    matrix_b.append(matrix_element_b(X,Y,i+1,N))
+ 
+ 
+#函数matrix_element_A_()用来求扩展矩阵A_，array_A表示系数矩阵A，array_b表示方程组右侧常数，A_row表示A的行秩
+def matrix_element_A_(array_A,array_b,A_row):
+    M=A_row  #局部变量M，与全局变量M无关
+    matrix_A_= []
+    for i in range(0,M+1):
+        matrix_A_.append([])
+        for j in range(0,M+2):
+            matrix_A_[i].append(0)
+            if j<M+1:
+                matrix_A_[i][j] = array_A[i][j]
+            elif j==M+1:     #如果不加这个控制条件，matrix_A_将被array_b刷新
+                matrix_A_[i][j] = array_b[i]
+    return matrix_A_
+matrix_A_ = matrix_element_A_(matrix_A,matrix_b,M)
+ 
+ 
+'''
+多项式拟合函数
+'''
+#x为自变量，w为多项式系数，m为多项式的阶数
+def poly_fit(x,wp,m):
+    sumf = 0
+    for j in range(0,m+1):
+        sumf=sumf+wp[j]*pow(x,j)
+    return sumf
+ 
+ 
+'''
+sin(2*pi*x)在x=0处的3阶泰勒展开式
+'''
+coef_taylor = [] #正弦函数的泰勒展开式系数
+K=3  #展开到K阶
+if K%2==0:
+    print "K必须为正奇数"
+s = 0
+k=(K-1)/2+1  #小k为系数个数
+#求K阶泰勒展开式的系数：
+for i in range(0,k):
+    s = pow(-1,i)*pow(2*np.pi,2*i+1)/math.factorial(2*i+1)
+    coef_taylor.append(s)
+print "%d阶泰勒级数展开式的系数为：" %K
+print coef_taylor
+#tx为泰勒展开式函数的自变量    
+def sin_taylor(tx):
+    sum_tay=0
+    for i in range(0,k):
+        sum_tay=sum_tay+coef_taylor[i]*pow(tx,2*k+1)
+    return sum_tay
+poly_taylor_a = []   #泰勒展开式函数的输入值
+poly_taylor_b = []   #泰勒展开式函数的预测值
+for i in range(0,N):
+    poly_taylor_a.append(a[i])
+    poly_taylor_b.append(sin_taylor(poly_taylor_a[i]))
+ 
+ 
+ 
+ 
+'''
+在x=[0,1]上生成100个点，作为测试集
+'''
+testa = []  #测试集的横坐标
+testb = []  #测试集的纵坐标
+x=0
+for i in range(0,100):
+    x=x+1.0/101.0
+    testa.append(x)
+    testb.append(np.sin(2*np.pi*x))
+    
+'''
+计算泰勒展开式模型的训练误差和测试误差
+'''
+#定义误差函数：
+#ly为真实值，fx为预测值
+def Lfun(ly,fx):
+    L=0
+    for i in range(0,len(fx)):
+        L=L+pow(ly[i]-fx[i],2)
+    return L
+ 
+ 
+'''
+主程序
+'''
+if __name__ == '__main__':
+# 求解方程组, 并输出方程组的可解信息
+    ret = solve( matrix_A_, 0, 0 ) 
+    if( ret== 0 ):
+        print "方 程组无唯一解或无解\n"
+   
+    # 输出方程组及其解，解即为w[j]
+    w = []
+    for i in range( 0, len( m ) ):
+        w.append(m[i][len( m )])
+    print "M=%d时的系数w[j]：" %M
+    print w
+    
+    #多项式拟合后的预测值：
+    poly_a = []
+    poly_b = []
+    for i in range(0,N):
+        poly_a.append(a[i])
+        poly_b.append(poly_fit(poly_a[i],w,M))
+ 
+ 
+    #fxtay为泰勒展开式的预测值,LCtaylor为测试误差：
+    fxtay = []
+    for i in range(0,100):
+         fxtay.append(sin_taylor(testa[i]))
+    LCtaylor = Lfun(testb,fxtay)/100
+    print "三阶泰勒展开式的测试误差为：%f" %LCtaylor
+ 
+ 
+    #fxpoly为M阶多项式拟合函数的预测值，LXpoly为训练误差：
+    fxpoly = []
+    for i in range(0,N):   #len(poly_b)=N=10
+        fxpoly.append(poly_fit(a[i],w,M))
+    LXpoly = Lfun(b,fxpoly)/len(poly_b)
+    print "M=%d时多项式拟合函数的训练误差为：%f" % (M,LXpoly)
+ 
+ 
+    #fxpolyc为M阶多项式拟合函数的预测值，LCpoly为测试误差：
+    fxpolyc = []
+    for i in range(0,100):
+        fxpolyc.append(poly_fit(testa[i],w,M))
+    LCpoly = Lfun(testb,fxpolyc)/100 
+    print "M=%d时多项式拟合函数的测试误差为：%f" % (M,LCpoly)
+    
+    #多项式拟合的效果：
+    fig1 = plt.figure(1)
+    plt.plot(poly_a,poly_b,color='blue',linestyle='solid',marker='o') 
+    #加入epsilon后的样本：
+    plt.plot(a,b,color='red',linestyle='dashed',marker='x') 
+    #泰勒展开式拟合效果：
+    plt.plot(poly_taylor_a,poly_taylor_b,color='yellow',linestyle='dashed',marker='o')
+    #figure(2)对比多项式拟合函数与训练数据：
+    fig2 = plt.figure(2)
+    plt.plot(poly_a,poly_b,color='blue',linestyle='solid',marker='o')
+    plt.plot(a,b,color='red',linestyle='dashed',marker='x')
+    plt.show()
