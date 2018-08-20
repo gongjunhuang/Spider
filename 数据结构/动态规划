@@ -51,3 +51,123 @@ if __name__=='__main__':
     res=bag(n,c,w,p)  
     show(n,c,w,res)
 '''
+
+
+动态规划的核心其实就是一个决策顺序的问题。
+
+寻找有向无环图中某一点到另一点的路径就是一个典型的决策顺序问题。
+
+'''
+# DAG的最短路径问题
+def dag_sp(W, s, t):
+    d = {u:float('int') for u in W}
+    d[s] = 0
+    for u in topsort(W):
+        if u == t:
+            break
+        for v in W[u]:
+            d[v] = min(d[v], d[u] + W[u][v])
+    return d[t]
+
+
+# 有向无环路图的拓扑排序
+def topsort(G):
+    count = dict((u, 0) for u in G)
+    for u in G:
+        for v in G[u]:
+            count[v] += 1
+    Q = [u for u in G if count[u] == 0]
+    S = []
+    while Q:
+        u = Q.pop()
+        S.append(u)
+        for v in G[u]:
+            count[v] -= 1
+            if count[v] == 0:
+                Q.append()
+    return S
+'''
+
+
+动态规划
+
+优化问题的典型例子包括使用最少的硬币找零。假设你是一个自动售货机制造商的程序员。你的公司希望通过给每个交易最少硬币来简化工作。假设客户放入 1 美元的钞票并购买 37 美分的商品。你可以用来找零的最小数量的硬币是多少？答案是六个硬币：两个 25 美分，一个 10美分 和 三个一美分。我们如何得到六个硬币的答案？我们从最大的硬币（25 美分）开始，并尽可能多，然后我们去找下一个小点的硬币，并尽可能多的使用它们。这第一种方法被称为贪婪方法，因为我们试图尽快解决尽可能大的问题。
+当我们使用美国货币时，贪婪的方法工作正常，但是假设你的公司决定在埃尔博尼亚部署自动贩卖机，除了通常的 1，5，10 和 25 分硬币，他们还有一个 21 分硬币 。在这种情况下，我们的贪婪的方法找不到 63 美分的最佳解决方案。 随着加入 21分硬币，贪婪的方法仍然会找到解决方案是六个硬币。然而，最佳答案是三个 21 分。
+让我们看一个方法，我们可以确定会找到问题的最佳答案。由于这一节是关于递归的，你可能已经猜到我们将使用递归解决方案。让我们从基本情况开始，如果我们可以与我们硬币的价值相同的金额找零，答案很容易，一个硬币。
+如果金额不匹配，我们有几个选项。我们想要的是最低一个一分钱加上原始金额减去一分钱所需的硬币数量，或者一个 5 美分加上原始金额减去 5 美分所需的硬币数量，或者一个 10 美分加上原始金额减去 10 美分所需的硬币数量，等等。
+
+'''
+def recMC(coinValueList,change):
+   minCoins = change
+   if change in coinValueList:
+     return 1
+   else:
+      for i in [c for c in coinValueList if c <= change]:
+         numCoins = 1 + recMC(coinValueList,change-i)
+         if numCoins < minCoins:
+            minCoins = numCoins
+   return minCoins
+
+print(recMC([1,5,10,25],63))
+'''
+
+
+减少我们工作量的关键是记住一些过去的结果，这样我们可以避免重新计算我们已经知道的结果。一个简单的解决方案是将最小数量的硬币的结果存储在表中。然后在计算新的最小值之前，我们首先检查表，看看结果是否已知。如果表中已有结果，我们使用表中的值，而不是重新计算。 ActiveCode 1 显示了一个修改的算法，以合并我们的表查找方案。
+
+'''
+def recDC(coinValueList,change,knownResults):
+   minCoins = change
+   if change in coinValueList:
+      knownResults[change] = 1
+      return 1
+   elif knownResults[change] > 0:
+      return knownResults[change]
+   else:
+       for i in [c for c in coinValueList if c <= change]:
+         numCoins = 1 + recDC(coinValueList, change-i,
+                              knownResults)
+         if numCoins < minCoins:
+            minCoins = numCoins
+            knownResults[change] = minCoins
+   return minCoins
+
+print(recDC([1,5,10,25],63,[0]*64))
+'''
+
+
+最终版
+'''
+def dpMakeChange(coinValueList,change,minCoins,coinsUsed):
+   for cents in range(change+1):
+      coinCount = cents
+      newCoin = 1
+      for j in [c for c in coinValueList if c <= cents]:
+            if minCoins[cents-j] + 1 < coinCount:
+               coinCount = minCoins[cents-j]+1
+               newCoin = j
+      minCoins[cents] = coinCount
+      coinsUsed[cents] = newCoin
+   return minCoins[change]
+
+def printCoins(coinsUsed,change):
+   coin = change
+   while coin > 0:
+      thisCoin = coinsUsed[coin]
+      print(thisCoin)
+      coin = coin - thisCoin
+
+def main():
+    amnt = 63
+    clist = [1,5,10,21,25]
+    coinsUsed = [0]*(amnt+1)
+    coinCount = [0]*(amnt+1)
+
+    print("Making change for",amnt,"requires")
+    print(dpMakeChange(clist,amnt,coinCount,coinsUsed),"coins")
+    print("They are:")
+    printCoins(coinsUsed,amnt)
+    print("The used list is as follows:")
+    print(coinsUsed)
+
+main()
+'''
