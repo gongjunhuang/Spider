@@ -112,4 +112,150 @@ def mergeSort(list):
 
 
 
+def quicksort(list):
+	length = len(list)
+	if len < 2:
+		return list
+	else:
+		midpivot = list[0]
+		lessbefore = [i for i in list if list[i] < midpivot]
+		bigafter = [i for i in list if list[i] > midpivot]
+		return quicksort(lessbefore) + [midpivot] + quicksort(bigafter)
+
+
+def selectsort(list):
+	length = len(list)
+	if length < 2:
+		return list
+
+	for i in range(length):
+		min_index = i
+		for j in range(i+1, length):
+			if list[j] < list[i]:
+				min_index = j
+		list[i], list[min_index] = list[min_index], list[i]
+	return list
+
+def insertsort(list):
+	length = len(list)
+	if length < 2:
+		return list
+
+	for i in range(length):
+		for j in range(i):
+			if list[j] > list[i]:
+				list.insert(j, list[i])
+				list.pop(j+1)
+				break
+	return list
+
+class SingleTon(object):
+	def __new__(cls, *args, **kwargs):
+		if not hasattr(cls, '_instance'):
+			orig = super(SingleTon, cls)
+			cls._instance = orig.__new__(cls, *args, **kwargs)
+		return cls._instance
+
+
+装饰器
+def use_logging(func):
+	def wrapper():
+		print('%s'%func.__name__)
+		return func()
+	return wrapper
+
+
+链表成对调换
+
+1->2->3->4转换成2->1->4->3
+
+class ListNode():
+	def init(self, x):
+		self.val = x
+		self.next = None
+
+class Solution:
+	def swappairs(self, head):
+		if head == None || head.next == None:
+			return head
+		next = head.next
+		head.next = self.swappairs(next.next)
+		next.next= head
+		return next
+
+
+二叉树遍历
+
+class Node(object):
+	def init(self, value, left, right):
+		self.value = value
+		self.left = left
+		self.right = right
+
+	def mid_traversal(root):
+		if root == None:
+			return None
+		if root.left is not None:
+			mid_traversal(root.left)
+		print(root.val)
+		if root.right is not None:
+			mid_traversal(root.right)
+
+	def pre_traversal(root):
+		if root == None:
+			return None
+		print(root.val)
+		if root.left is not None:
+			pre_traversal(root.left)
+		if root.right is not None:
+			pre_traversal(root.right)
+
+	def post_traversal(root):
+		if root == None:
+			return None
+		if root.left is not None:
+			post_traversal(root.left)
+		if root.right is not None:
+			post_traversal(root.right)
+		print(root.val)
+
+	def max_depth(root):
+		if not root:
+			return 0
+		return max(max_depth(root.left), max_depth(root.right))+1
+
+	def isSameTree(p, q):
+		if p == None and q == None:
+			return True
+		elif p and q:
+			return p.val == q.val and isSameTree(p.left, q.left)
+				and isSameTree(p.right, q.right)
+		else:
+			return False
+
+
+
+判断字符串是否是变形的
+
+def isSameWords(s1, s2):
+	if len(s1) != len(s2):
+		return False 
+
+	alist1 = list(s1)
+	alist2 = list(s2)
+	alist1.sort(s1)
+	alist2.sort(s2)
+
+	pos = 0
+	matches = True
+
+	while pos < len(s1) and matches:
+		if alist1[pos] == alist2[pos]:
+			post += 1
+		else:
+			matches = False
+	return matches
+
+
+
 
