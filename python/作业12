@@ -1,3 +1,48 @@
+特征向量和距离度量
+
+从定义出发，Ax=cx：A为矩阵，c为特征值，x为特征向量。 
+矩阵A乘以x表示，对向量x进行一次转换（旋转或拉伸）（是一种线性转换），而该转换的效果为常数c乘以向量x（即只进行拉伸）。 
+
+
+1. 欧氏距离(Euclidean Distance)
+欧氏距离是最易于理解的一种距离计算方法，源自欧氏空间中两点间的距离公式。
+
+d = ((x1-x2)^2+(y1-y2)^2)
+
+'''
+import numpy as np
+x=np.random.random(10)
+y=np.random.random(10)
+
+d1=np.sqrt(np.sum(np.square(x-y)))
+'''
+
+2. 曼哈顿距离(Manhattan Distance)
+二维平面两点a(x1,y1)与b(x2,y2)间的曼哈顿距离
+d = |x1-x2|+|y1-y2|
+
+'''
+import numpy as np
+x=np.random.random(10)
+y=np.random.random(10)
+
+d1=np.sum(np.abs(x-y))
+'''
+
+3. 切比雪夫距离 ( Chebyshev Distance )
+
+(1)二维平面两点a(x1,y1)与b(x2,y2)间的切比雪夫距离
+
+d = max(|x1-x2|, |y1-y2|)
+
+'''
+import numpy as np
+x=np.random.random(10)
+y=np.random.random(10)
+
+d1=np.max(np.abs(x-y))
+'''
+
 聚类分析
 
 聚类属于无监督学习，以往的回归、朴素贝叶斯、SVM等都是有类别标签y的，也就是说样例中已经给出了样例的分类。而聚类的样本中
