@@ -48,3 +48,9 @@ Error有两种：false accept和false reject。false accept意思是误把负类
 4. Weighted Classification
 实际上，机器学习的Cost Function即来自于这些error，也就是算法里面的迭代的目标函数，通过优化使得Error（Ein）不断变小。 
 cost function中，false accept和false reject赋予不同的权重，在演算法中体现。对不同权重的错误惩罚，可以选用virtual copying的方法。
+
+
+
+
+第九课： Linear Regression
+
