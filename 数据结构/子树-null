@@ -1,0 +1,58 @@
+For example,
+Given the following binary tree,
+
+         1
+       /  \
+      2    3
+     / \    \
+    4   5    7
+
+After calling your function, the tree should look like:
+
+         1 -> NULL
+       /  \
+      2 -> 3 -> NULL
+     / \    \
+    4-> 5 -> 7 -> NULL
+
+
+
+
+'''
+/**
+ * Definition for binary tree with next pointer.
+ * public class TreeLinkNode {
+ *     int val;
+ *     TreeLinkNode left, right, next;
+ *     TreeLinkNode(int x) { val = x; }
+ * }
+ */
+import java.util.*;
+public class Solution {
+    public void connect(TreeLinkNode root) {
+        if(root == null){
+            return;
+        }
+        Queue<TreeLinkNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while(!queue.isEmpty()){
+            int len = queue.size();
+            for(int i=0; i<len; i++){
+                TreeLinkNode tmp = queue.poll();
+                if(i == len-1){
+                    tmp.next = null;
+                }else{
+                    tmp.next = queue.peek();
+                }
+                
+                if(tmp.left != null){
+                    queue.offer(tmp.left);
+                }
+                if(tmp.right != null){
+                    queue.offer(tmp.right);
+                }
+            }
+        }
+    }
+}
+'''
