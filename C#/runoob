@@ -1,0 +1,297 @@
+关键字 class ，这个关键字的用途是声明类。比如上面例子中，类名叫做Program。
+
+关键字 namespace ，这个关键字的用途是声明“命名空间”。比如上面例子中，命名空间叫做MyApp1。
+
+关键字 using ，这个关键字的用途是导入命名空间。比如这句：using System.Text; 作用是导入System.Text命名空间中的类。
+
+关键字 static (静态的)、 void (无返回值)、 string (字符串类型)。常常在Main()方法的声明中看到:static void Main(string[] args)
+
+Main() 方法是 C# 中的特殊方法，是程序的入口，就是说，如果没有 Main ()方法，程序就无法启动。
+
+注意：你会发现，所有关键字都是由小写字母组成的，C#语言中，大小写是严格区分的。 	
+
+
+①括号。学数学的时候我们就知道，要先计算括号里面的内容。C#语言也是一样，如果有多层括号，要从里向外计算。括号优先级最高。
+
+②一元运算符。有些运算符两边有2个操作数，比如2+3、6%5等等，这些叫做二元运算符。只有一个操作数的叫做一元运算符，它们的优先级高于二元运算符。一元运算符包括：++(自加) 、 --（自减） 、 !（逻辑非）。
+
+③*（乘）、/（除）、%（取余）。
+
+④+（加）、-（减）。
+
+⑤>（大于）、<（小于）、>=（大于等于）、<=（小于等于）。
+
+⑥==（等于）、!=（不等于）。
+
+⑦&&（逻辑与）。
+
+⑧||（逻辑或）。
+
+⑨赋值运算符。包括：=、+=、-=、*=、/=、%=。
+
+
+
+创建 String 对象
+您可以使用以下方法之一来创建 string 对象：
+
+通过给 String 变量指定一个字符串
+通过使用 String 类构造函数
+通过使用字符串串联运算符（ + ）
+通过检索属性或调用一个返回字符串的方法
+通过格式化方法来转换一个值或对象为它的字符串表示形式
+
+'''
+//字符串，字符串连接
+string fname, lname;
+fname = "Rowan";
+lname = "Atkinson";
+
+string fullname = fname + lname;
+Console.WriteLine("Full Name: {0}", fullname);
+
+//通过使用 string 构造函数
+char[] letters = { 'H', 'e', 'l', 'l','o' };
+string greetings = new string(letters);
+Console.WriteLine("Greetings: {0}", greetings);
+
+//方法返回字符串
+string[] sarray = { "Hello", "From", "Tutorials", "Point" };
+string message = String.Join(" ", sarray);
+Console.WriteLine("Message: {0}", message);
+
+//用于转化值的格式化方法
+DateTime waiting = new DateTime(2012, 10, 10, 17, 58, 1);
+string chat = String.Format("Message sent at {0:t} on {0:D}", 
+waiting);
+Console.WriteLine("Message: {0}", chat);
+Console.ReadKey() ;
+'''
+
+
+
+
+定义结构体
+为了定义一个结构体，您必须使用 struct 语句。struct 语句为程序定义了一个带有多个成员的新的数据类型。
+
+例如，您可以按照如下的方式声明 Book 结构：
+
+struct Books
+{
+   public string title;
+   public string author;
+   public string subject;
+   public int book_id;
+};  
+
+
+
+Books Book1;        /* 声明 Book1，类型为 Book */
+
+/* book 1 详述 */
+Book1.title = "C Programming";
+Book1.author = "Nuha Ali"; 
+Book1.subject = "C Programming Tutorial";
+Book1.book_id = 6495407;
+
+
+C# 结构的特点
+您已经用了一个简单的名为 Books 的结构。在 C# 中的结构与传统的 C 或 C++ 中的结构不同。C# 中的结构有以下特点：
+
+结构可带有方法、字段、索引、属性、运算符方法和事件。
+结构可定义构造函数，但不能定义析构函数。但是，您不能为结构定义默认的构造函数。默认的构造函数是自动定义的，且不能被改变。
+与类不同，结构不能继承其他的结构或类。
+结构不能作为其他结构或类的基础结构。
+结构可实现一个或多个接口。
+结构成员不能指定为 abstract、virtual 或 protected。
+当您使用 New 操作符创建一个结构对象时，会调用适当的构造函数来创建结构。与类不同，结构可以不使用 New 操作符即可被实例化。
+如果不使用 New 操作符，只有在所有的字段都被初始化之后，字段才被赋值，对象才被使用。
+
+
+
+
+
+1、结构体中声明的字段无法赋予初值，类可以:
+
+struct test001
+{
+    private int aa = 1;
+}
+执行以上代码将出现“结构中不能实例属性或字段初始值设定”的报错，而类中无此限制，代码如下：
+
+class test002
+{
+    private int aa = 1;
+}
+2、结构体的构造函数中，必须为结构体所有字段赋值，类的构造函数无此限制:
+
+补充：类与结构的选择
+
+
+
+
+C# 枚举（Enum）
+枚举是一组命名整型常量。枚举类型是使用 enum 关键字声明的。
+
+C# 枚举是值类型。换句话说，枚举包含自己的值，且不能继承或传递继承。
+
+声明 enum 变量
+声明枚举的一般语法：
+
+enum <enum_name>
+{ 
+    enumeration list 
+};
+其中，
+
+enum_name 指定枚举的类型名称。
+enumeration list 是一个用逗号分隔的标识符列表。
+
+枚举列表中的每个符号代表一个整数值，一个比它前面的符号大的整数值。默认情况下，第一个枚举符号的值是 0.例如：
+
+enum Days { Sun, Mon, tue, Wed, thu, Fri, Sat };
+
+
+enum Days { Sun, Mon, tue, Wed, thu, Fri, Sat };
+
+static void Main(string[] args)
+{
+ int WeekdayStart = (int)Days.Mon;
+ int WeekdayEnd = (int)Days.Fri;
+ Console.WriteLine("Monday: {0}", WeekdayStart);
+ Console.WriteLine("Friday: {0}", WeekdayEnd);
+ Console.ReadKey();
+
+
+
+
+ C# 中的构造函数
+类的 构造函数 是类的一个特殊的成员函数，当创建类的新对象时执行。
+
+构造函数的名称与类的名称完全相同，它没有任何返回类型。
+
+
+默认的构造函数没有任何参数。但是如果你需要一个带有参数的构造函数可以有参数，这种构造函数叫做参数化构造函数。这种技术可以帮助你在创建对象的同时给对象赋初始值
+
+
+C# 中的析构函数
+类的 析构函数 是类的一个特殊的成员函数，当类的对象超出范围时执行。
+
+析构函数的名称是在类的名称前加上一个波浪形（~）作为前缀，它不返回值，也不带任何参数。
+
+析构函数用于在结束程序（比如关闭文件、释放内存等）之前释放资源。析构函数不能继承或重载。
+
+ ~Line() //析构函数
+{
+ Console.WriteLine("对象已删除");
+}
+
+
+C# 类的静态成员
+我们可以使用 static 关键字把类成员定义为静态的。当我们声明一个类成员为静态时，意味着无论有多少个类的对象被创建，只会有一个该静态成员的副本。
+
+关键字 static 意味着类中只有一个该成员的实例。静态变量用于定义常量，因为它们的值可以通过直接调用类而不需要创建类的实例来获取。静态变量可在成员函数或类的定义外部进行初始化。你也可以在类的定义内部初始化静态变量。
+
+你也可以把一个成员函数声明为 static。这样的函数只能访问静态变量。静态函数在对象被创建之前就已经存在。
+
+
+
+
+C# 继承
+继承是面向对象程序设计中最重要的概念之一。继承允许我们根据一个类来定义另一个类，这使得创建和维护应用程序变得更容易。同时也有利于重用代码和节省开发时间。
+
+当创建一个类时，程序员不需要完全重新编写新的数据成员和成员函数，只需要设计一个新的类，继承了已有的类的成员即可。这个已有的类被称为的基类，这个新的类被称为派生类。
+
+继承的思想实现了 属于（IS-A） 关系。例如，哺乳动物 属于（IS-A） 动物，狗 属于（IS-A） 哺乳动物，因此狗 属于（IS-A） 动物。
+
+
+基类和派生类
+一个类可以派生自多个类或接口，这意味着它可以从多个基类或接口继承数据和函数。
+
+C# 中创建派生类的语法如下：
+
+<访问修饰符符> class <基类>
+{
+ ...
+}
+class <派生类> : <基类>
+{
+ ...
+}
+
+
+基类的初始化
+派生类继承了基类的成员变量和成员方法。因此父类对象应在子类对象创建之前被创建。
+
+
+
+
+C# 多态性
+多态性意味着有多重形式。在面向对象编程范式中，多态性往往表现为"一个接口，多个功能"。
+
+多态性可以是静态的或动态的。在静态多态性中，函数的响应是在编译时发生的。在动态多态性中，函数的响应是在运行时发生的。
+
+静态多态性
+在编译时，函数和对象的连接机制被称为早期绑定，也被称为静态绑定。C# 提供了两种技术来实现静态多态性。分别为：
+
+函数重载
+运算符重载
+运算符重载将在下一章节讨论，接下来我们将讨论函数重载。
+
+函数重载
+您可以在同一个范围内对相同的函数名有多个定义。函数的定义必须彼此不同，可以是参数列表中的参数类型不同，也可以是参数个数不同。不能重载只有返回类型不同的函数声明。
+
+
+动态多态性
+C# 允许您使用关键字 abstract 创建抽象类，用于提供接口的部分类的实现。当一个派生类继承自该抽象类时，实现即完成。抽象类包含抽象方法，抽象方法可被派生类实现。派生类具有更专业的功能。
+
+请注意，下面是有关抽象类的一些规则：
+
+您不能创建一个抽象类的实例。
+您不能在一个抽象类外部声明一个抽象方法。
+通过在类定义前面放置关键字 sealed，可以将类声明为密封类。当一个类被声明为 sealed 时，它不能被继承。抽象类不能被声明为 sealed。
+
+
+当有一个定义在类中的函数需要在继承类中实现时，可以使用虚方法。虚方法是使用关键字 virtual 声明的。虚方法可以在不同的继承类中有不同的实现。对虚方法的调用是在运行时发生的。
+
+动态多态性是通过 抽象类 和 虚方法 实现的。
+
+'''
+class Shape 
+   {
+      protected int width, height;
+      public Shape( int a=0, int b=0)
+      {
+         width = a;
+         height = b;
+      }
+      public virtual int area()
+      {
+         Console.WriteLine("父类的面积：");
+         return 0;
+      }
+   }
+   class Rectangle: Shape
+   {
+      public Rectangle( int a=0, int b=0): base(a, b)
+      {
+
+      }
+      public override int area ()
+      {
+         Console.WriteLine("Rectangle 类的面积：");
+         return (width * height); 
+      }
+   }
+   class Triangle: Shape
+   {
+      public Triangle(int a = 0, int b = 0): base(a, b)
+      {
+      
+      }
+      public override int area()
+      {
+         Console.WriteLine("Triangle 类的面积：");
+         return (width * height / 2); 
+      }
+   }
+'''
