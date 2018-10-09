@@ -295,3 +295,152 @@ class Shape
       }
    }
 '''
+
+
+virtual和abstract都是用来修饰父类的，通过覆盖父类的定义，让子类重新定义。
+
+ 1.virtual修饰的方法必须有实现（哪怕是仅仅添加一对大括号),而abstract修饰的方法一定不能实现。
+ 2.virtual可以被子类重写，而abstract必须被子类重写。
+ 3.如果类成员被abstract修饰，则该类前必须添加abstract，因为只有抽象类才可以有抽象方法。
+ 4.无法创建abstract类的实例，只能被继承无法实例化。
+重载和重写
+重载(overload)是提供了一种机制, 相同函数名通过不同的返回值类型以及参数来表来区分的机制。
+
+
+
+
+
+C# 运算符重载
+您可以重定义或重载 C# 中内置的运算符。因此，程序员也可以使用用户自定义类型的运算符。重载运算符是具有特殊名称的函数，是通过关键字 operator 后跟运算符的符号来定义的。与其他函数一样，重载运算符有返回类型和参数列表。
+
+例如，请看下面的函数：
+
+public static Box operator+ (Box b, Box c)
+{
+   Box box = new Box();
+   box.length = b.length + c.length;
+   box.breadth = b.breadth + c.breadth;
+   box.height = b.height + c.height;
+   return box;
+}
+上面的函数为用户自定义的类 Box 实现了加法运算符（+）。它把两个 Box 对象的属性相加，并返回相加后的 Box 对象。
+
+
+
+operator 关键字用于在类或结构声明中声明运算符。运算符声明可以采用下列四种形式之一：
+
+public static result-type operator unary-operator ( op-type operand )
+public static result-type operator binary-operator ( op-type operand, op-type2 operand2 )
+public static implicit operator conv-type-out ( conv-type-in operand )
+public static explicit operator conv-type-out ( conv-type-in operand )
+参数：
+
+ result-type 运算符的结果类型。
+ unary-operator 下列运算符之一：+ - ! ~ ++ — true false
+ op-type 第一个（或唯一一个）参数的类型。
+ operand 第一个（或唯一一个）参数的名称。
+ binary-operator 其中一个：+ - * / % & | ^ << >> == != > < >= <=
+ op-type2 第二个参数的类型。
+ operand2 第二个参数的名称。
+ conv-type-out 类型转换运算符的目标类型。
+ conv-type-in 类型转换运算符的输入类型。
+注意：
+
+前两种形式声明了用户定义的重载内置运算符的运算符。并非所有内置运算符都可以被重载（请参见可重载的运算符）。op-type 和 op-type2 中至少有一个必须是封闭类型（即运算符所属的类型，或理解为自定义的类型）。例如，这将防止重定义整数加法运算符。
+
+后两种形式声明了转换运算符。conv-type-in 和 conv-type-out 中正好有一个必须是封闭类型（即，转换运算符只能从它的封闭类型转换为其他某个类型，或从其他某个类型转换为它的封闭类型）。
+
+运算符只能采用值参数，不能采用 ref 或 out 参数。
+
+C# 要求成对重载比较运算符。如果重载了==，则也必须重载!=，否则产生编译错误。同时，比较运算符必须返回bool类型的值，这是与其他算术运算符的根本区别。
+
+C# 不允许重载=运算符，但如果重载例如+运算符，编译器会自动使用+运算符的重载来执行+=运算符的操作。
+
+运算符重载的其实就是函数重载。首先通过指定的运算表达式调用对应的运算符函数，然后再将运算对象转化为运算符函数的实参，接着根据实参的类型来确定需要调用的函数的重载，这个过程是由编译器完成。
+
+任何运算符声明的前面都可以有一个可选的属性（C# 编程指南）列表。
+
+
+
+
+
+
+C# 接口（Interface）
+接口定义了所有类继承接口时应遵循的语法合同。接口定义了语法合同 "是什么" 部分，派生类定义了语法合同 "怎么做" 部分。
+
+接口定义了属性、方法和事件，这些都是接口的成员。接口只包含了成员的声明。成员的定义是派生类的责任。接口提供了派生类应遵循的标准结构。
+
+接口使得实现接口的类或结构在形式上保持一致。
+
+抽象类在某种程度上与接口类似，但是，它们大多只是用在当只有少数方法由基类声明由派生类实现时。
+
+定义接口: MyInterface.cs
+接口使用 interface 关键字声明，它与类的声明类似。接口声明默认是 public 的。下面是一个接口声明的实例：
+
+interface IMyInterface
+{
+    void MethodToImplement();
+}
+以上代码定义了接口 IMyInterface。通常接口命令以 I 字母开头，这个接口只有一个方法 MethodToImplement()，没有参数和返回值，当然我们可以按照需求设置参数和返回值。
+
+值得注意的是，该方法并没有具体的实现。
+
+接下来我们来实现以上接口：InterfaceImplementer.cs
+using System;
+
+interface IMyInterface
+{
+    // 接口成员
+    void MethodToImplement();
+}
+
+class InterfaceImplementer : IMyInterface
+{
+    static void Main()
+    {
+        InterfaceImplementer iImp = new InterfaceImplementer();
+        iImp.MethodToImplement();
+    }
+
+    public void MethodToImplement()
+    {
+        Console.WriteLine("MethodToImplement() called.");
+    }
+}
+InterfaceImplementer 类实现了 IMyInterface 接口，接口的实现与类的继承语法格式类似：
+
+class InterfaceImplementer : IMyInterface
+继承接口后，我们需要实现接口的方法 MethodToImplement() , 方法名必须与接口定义的方法名一致。
+
+
+接口注意的几点：
+
+接口方法不能用public abstract等修饰。接口内不能有字段变量，构造函数。
+接口内可以定义属性（有get和set的方法）。如string color { get ; set ; }这种。
+实现接口时，必须和接口的格式一致。
+必须实现接口的所有方法。
+
+
+1.接口的特点
+接口的定义是指定一组函数成员而不实现成员的引用类型，其它类型和接口可以继承接口。定义还是很好理解的，但是没有反映特点，接口主要有以下特点：
+
+ (1)通过接口可以实现多重继承，C# 接口的成员不能有 public、protected、internal、private 等修饰符。原因很简单，接口里面的方法都需要由外面接口实现去实现方法体，那么其修饰符必然是 public。C# 接口中的成员默认是 public 的，java 中是可以加 public 的。
+ (2)接口成员不能有 new、static、abstract、override、virtual 修饰符。有一点要注意，当一个接口实现一个接口，这2个接口中有相同的方法时，可用 new 关键字隐藏父接口中的方法。
+ (3)接口中只包含成员的签名，接口没有构造函数，所有不能直接使用 new 对接口进行实例化。接口中只能包含方法、属性、事件和索引的组合。接口一旦被实现，实现类必须实现接口中的所有成员，除非实现类本身是抽象类。
+ (4)C# 是单继承，接口是解决 C# 里面类可以同时继承多个基类的问题。
+
+
+ 接口和抽象类的区别
+接口用于规范，抽象类用于共性。抽象类是类，所以只能被单继承，但是接口却可以一次实现多个。
+
+接口中只能声明方法，属性，事件，索引器。而抽象类中可以有方法的实现，也可以定义非静态的类变量。
+
+抽象类可以提供某些方法的部分实现，接口不可以。抽象类的实例是它的子类给出的。接口的实例是实现接口的类给出的。
+
+在抽象类中加入一个方法，那么它的子类就同时有了这个方法。而在接口中加入新的方法，那么实现它的类就要重新编写（这就是为什么说接口是一个类的规范了）。
+
+接口成员被定义为公共的，但抽象类的成员也可以是私有的、受保护的、内部的或受保护的内部成员（其中受保护的内部成员只能在应用程序的代码或派生类中访问）。
+
+此外接口不能包含字段、构造函数、析构函数、静态成员或常量。
+
+还有一点，我们在VS中实现接口时会发现有2个选项，一个是实现接口，一个是显示实现接口。实现接口就是我们平常理解的实现接口，而显示实现接口的话，实现的方法是属于接口的，而不是属于实现类的。
